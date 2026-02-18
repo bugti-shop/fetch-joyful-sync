@@ -56,11 +56,11 @@ const Profile = () => {
         <Card className="p-6">
           <div className="flex items-center justify-between mb-4">
             <div className="flex items-center gap-2">
-              <Crown className={`h-6 w-6 ${isPremium ? 'text-amber-500' : 'text-muted-foreground'}`} />
+              <Crown className={`h-6 w-6 ${isPremium ? 'text-teal-500' : 'text-muted-foreground'}`} />
               <h3 className="font-semibold text-foreground">Subscription</h3>
             </div>
             {isPremium ? (
-              <Badge className="bg-amber-500 text-white border-0">Pro</Badge>
+              <Badge className="bg-teal-500 text-white border-0">Pro</Badge>
             ) : (
               <Badge variant="secondary">Free</Badge>
             )}
@@ -74,7 +74,7 @@ const Profile = () => {
               </p>
               <Button
                 onClick={() => setShowPaywall(true)}
-                className="w-full bg-amber-500 hover:bg-amber-600 text-white"
+                className="w-full bg-teal-500 hover:bg-teal-600 text-white"
               >
                 <Crown className="h-4 w-4 mr-2" />
                 Upgrade to Pro

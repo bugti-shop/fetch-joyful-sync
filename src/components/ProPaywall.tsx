@@ -155,7 +155,7 @@ export const ProPaywall = ({ isOpen, onClose, featureName }: ProPaywallProps) =>
                   : 'border-white/10 bg-white/5 hover:border-white/20'
               }`}
             >
-              <span className="absolute -top-2 left-1/2 -translate-x-1/2 px-1.5 py-0.5 bg-emerald-500 rounded-full text-[8px] font-bold text-white whitespace-nowrap">
+              <span className="absolute -top-2 left-1/2 -translate-x-1/2 px-1.5 py-0.5 bg-teal-500 rounded-full text-[8px] font-bold text-white whitespace-nowrap">
                 Best Value
               </span>
               {selectedPlan === 'yearly' && (
@@ -200,7 +200,7 @@ export const ProPaywall = ({ isOpen, onClose, featureName }: ProPaywallProps) =>
 export const ProBadge = ({ onClick, className = '' }: { onClick?: () => void; className?: string }) => (
   <button
     onClick={onClick}
-    className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-amber-500/10 border border-amber-500/30 text-amber-600 text-[10px] font-semibold ${className}`}
+    className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-teal-500/10 border border-teal-500/30 text-teal-600 text-[10px] font-semibold ${className}`}
   >
     <Crown className="h-3 w-3" />
     PRO

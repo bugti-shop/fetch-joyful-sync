@@ -178,11 +178,11 @@ export default function OnboardingFlow({ onComplete }: OnboardingFlowProps) {
           
           {/* Show warning if user has already used trial */}
           {!canUseTrial && (
-            <div className="bg-amber-50 border border-amber-200 rounded-xl p-4 mb-6 mx-auto w-80 flex items-start gap-3">
-              <AlertCircle className="w-5 h-5 text-amber-500 flex-shrink-0 mt-0.5" />
+            <div className="bg-teal-50 border border-teal-200 rounded-xl p-4 mb-6 mx-auto w-80 flex items-start gap-3">
+              <AlertCircle className="w-5 h-5 text-teal-500 flex-shrink-0 mt-0.5" />
               <div>
-                <p className="font-semibold text-amber-800 text-sm">Free trial already used</p>
-                <p className="text-amber-600 text-xs mt-1">You've already used your free trial. Subscribe to continue enjoying all premium features.</p>
+                <p className="font-semibold text-teal-800 text-sm">Free trial already used</p>
+                <p className="text-teal-600 text-xs mt-1">You've already used your free trial. Subscribe to continue enjoying all premium features.</p>
               </div>
             </div>
           )}
