@@ -7,6 +7,9 @@ import { Textarea } from '@/components/ui/textarea';
 import { Label } from '@/components/ui/label';
 import { useToast } from '@/hooks/use-toast';
 import { hapticFeedback } from '@/lib/haptics';
+import { useSubscription } from '@/contexts/SubscriptionContext';
+import { FREE_LIMITS } from '@/lib/freeLimits';
+import { ProPaywall } from '@/components/ProPaywall';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { currencies, loadCurrencySettings, convertCurrency, formatCurrencyAmount, getCurrencyByCode } from '@/lib/currency';
 import { useSmartSuggestions } from '@/hooks/useSmartSuggestions';
@@ -31,8 +34,11 @@ interface AddTransactionModalProps {
 const ACCOUNTS_STORAGE_KEY = 'jarify_accounts';
 
 export const AddTransactionModal = ({ isOpen, onClose, initialType = null }: AddTransactionModalProps) => {
-  const { categories, addExpense, addIncome } = useExpense();
+  const { categories, expenses, incomes, addExpense, addIncome } = useExpense();
   const { toast } = useToast();
+  const { canUseFeature } = useSubscription();
+  const isPremium = canUseFeature('unlimited_transactions');
+  const [showPaywall, setShowPaywall] = useState(false);
   const [step, setStep] = useState<'select' | 'form'>(initialType ? 'form' : 'select');
   const [transactionType, setTransactionType] = useState<'expense' | 'income'>(initialType || 'expense');
   const [accounts, setAccounts] = useState<Account[]>([]);
@@ -305,6 +311,18 @@ export const AddTransactionModal = ({ isOpen, onClose, initialType = null }: Add
     if (!categoryId) {
       toast({ title: 'Select category', description: 'Please select a category', variant: 'destructive' });
       return;
+    }
+
+    // Check free tier limits
+    if (!isPremium) {
+      if (transactionType === 'expense' && expenses.length >= FREE_LIMITS.maxExpenses) {
+        setShowPaywall(true);
+        return;
+      }
+      if (transactionType === 'income' && incomes.length >= FREE_LIMITS.maxIncomes) {
+        setShowPaywall(true);
+        return;
+      }
     }
 
     const settings = loadCurrencySettings();
@@ -839,6 +857,13 @@ export const AddTransactionModal = ({ isOpen, onClose, initialType = null }: Add
       <BatchEntryModal 
         isOpen={showBatchModal} 
         onClose={() => setShowBatchModal(false)} 
+      />
+
+      {/* Pro Paywall */}
+      <ProPaywall
+        isOpen={showPaywall}
+        onClose={() => setShowPaywall(false)}
+        featureName={`You've reached the free limit of ${transactionType === 'expense' ? `${FREE_LIMITS.maxExpenses} expenses` : `${FREE_LIMITS.maxIncomes} incomes`}. Upgrade to Pro for unlimited transactions!`}
       />
     </>
   );
