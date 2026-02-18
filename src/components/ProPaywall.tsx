@@ -2,6 +2,18 @@ import { useState } from 'react';
 import { Crown, Lock, Bell, MapPin, X, Check } from 'lucide-react';
 import { Button } from './ui/button';
 import { useSubscription } from '@/contexts/SubscriptionContext';
+import { hapticFeedback } from '@/lib/haptics';
+
+const triggerHaptic = async () => {
+  try {
+    await hapticFeedback.heavy();
+    setTimeout(async () => {
+      await hapticFeedback.heavy();
+    }, 50);
+  } catch (error) {
+    // Haptics not available
+  }
+};
 
 interface ProPaywallProps {
   isOpen: boolean;
@@ -106,7 +118,7 @@ export const ProPaywall = ({ isOpen, onClose, featureName }: ProPaywallProps) =>
           <div className="grid grid-cols-3 gap-2 mb-6">
             {/* Weekly */}
             <button
-              onClick={() => setSelectedPlan('weekly')}
+              onClick={() => { triggerHaptic(); setSelectedPlan('weekly'); }}
               className={`relative rounded-xl p-3 text-center transition-all border-2 ${
                 selectedPlan === 'weekly'
                   ? 'border-blue-500 bg-blue-500/10'
@@ -127,7 +139,7 @@ export const ProPaywall = ({ isOpen, onClose, featureName }: ProPaywallProps) =>
 
             {/* Monthly */}
             <button
-              onClick={() => setSelectedPlan('monthly')}
+              onClick={() => { triggerHaptic(); setSelectedPlan('monthly'); }}
               className={`relative rounded-xl p-3 text-center transition-all border-2 ${
                 selectedPlan === 'monthly'
                   ? 'border-blue-500 bg-blue-500/10'
@@ -148,7 +160,7 @@ export const ProPaywall = ({ isOpen, onClose, featureName }: ProPaywallProps) =>
 
             {/* Yearly */}
             <button
-              onClick={() => setSelectedPlan('yearly')}
+              onClick={() => { triggerHaptic(); setSelectedPlan('yearly'); }}
               className={`relative rounded-xl p-3 text-center transition-all border-2 ${
                 selectedPlan === 'yearly'
                   ? 'border-blue-500 bg-blue-500/10'
