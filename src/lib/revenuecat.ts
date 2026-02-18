@@ -263,9 +263,23 @@ export const purchaseByPlan = async (planType: PlanType): Promise<{
   error?: string;
 }> => {
   try {
-    const packages = await getCurrentPackages();
-    if (!packages) {
-      return { success: false, customerInfo: null, error: 'No packages available' };
+    // Try fetching packages with a retry
+    let packages = await getCurrentPackages();
+    
+    if (!packages || packages.length === 0) {
+      // Retry once after a short delay — offerings may not be loaded yet
+      console.log('No packages found, retrying in 2s...');
+      await new Promise(resolve => setTimeout(resolve, 2000));
+      packages = await getCurrentPackages();
+    }
+
+    if (!packages || packages.length === 0) {
+      console.error('No packages available after retry. Ensure the app is installed from Play Store and subscriptions are active in Google Play Console.');
+      return { 
+        success: false, 
+        customerInfo: null, 
+        error: 'Subscriptions are not available right now. Please make sure you installed the app from the Play Store and try again.' 
+      };
     }
 
     // Find package by product ID (Google Play) or RC package identifier
@@ -280,7 +294,7 @@ export const purchaseByPlan = async (planType: PlanType): Promise<{
     if (!pkg) {
       console.error(`Package not found for ${planType}. Looking for productId: ${productId} or packageId: ${rcPackageId}`);
       console.log('Available packages:', packages.map(p => ({ id: p.identifier, productId: p.product?.identifier })));
-      return { success: false, customerInfo: null, error: 'Package not found' };
+      return { success: false, customerInfo: null, error: `The ${planType} plan is not available right now. Please try another plan.` };
     }
 
     return await purchasePackage(pkg);
