@@ -484,9 +484,9 @@ export const AddTransactionModal = ({ isOpen, onClose, initialType = null }: Add
                     exit={{ opacity: 0, y: -10 }}
                     type="button"
                     onClick={applySmartSuggestion}
-                    className="w-full bg-gradient-to-r from-amber-500/20 to-orange-500/20 border border-amber-500/30 rounded-xl p-3 flex items-center gap-3"
+                    className="w-full bg-gradient-to-r from-teal-500/20 to-teal-400/20 border border-teal-500/30 rounded-xl p-3 flex items-center gap-3"
                   >
-                    <Sparkles size={20} className="text-amber-500" />
+                    <Sparkles size={20} className="text-teal-500" />
                     <div className="text-left flex-1">
                       <p className="text-sm font-medium text-foreground">Smart Suggestion</p>
                       <p className="text-xs text-muted-foreground">

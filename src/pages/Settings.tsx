@@ -357,7 +357,7 @@ const Settings = () => {
                 }}
                 className="w-full flex items-center justify-between py-4 px-4 text-foreground hover:bg-accent/50 transition-colors border-b border-border/50"
               >
-                <span className="text-base flex items-center gap-2">Back up data <Crown size={14} className="text-amber-500" /></span>
+                <span className="text-base flex items-center gap-2">Back up data <Crown size={14} className="text-teal-500" /></span>
                 <ChevronRight className="w-5 h-5 text-muted-foreground" />
               </button>
               <button
@@ -367,7 +367,7 @@ const Settings = () => {
                 }}
                 className="w-full flex items-center justify-between py-4 px-4 text-foreground hover:bg-accent/50 transition-colors border-b border-border/50"
               >
-                <span className="text-base flex items-center gap-2">Restore data <Crown size={14} className="text-amber-500" /></span>
+                <span className="text-base flex items-center gap-2">Restore data <Crown size={14} className="text-teal-500" /></span>
                 <ChevronRight className="w-5 h-5 text-muted-foreground" />
               </button>
             </>

@@ -339,12 +339,12 @@ const Tools = () => {
           </div>
         </div>
         <div className="flex flex-col items-center justify-center px-6 py-20 text-center">
-          <div className="w-16 h-16 rounded-full bg-amber-500/10 flex items-center justify-center mb-4">
-            <Crown size={32} className="text-amber-500" />
+          <div className="w-16 h-16 rounded-full bg-teal-500/10 flex items-center justify-center mb-4">
+            <Crown size={32} className="text-teal-500" />
           </div>
           <h2 className="text-xl font-bold text-foreground mb-2">Pro Feature</h2>
           <p className="text-muted-foreground mb-6">Financial Calculators are available with Jarify Pro. Upgrade to unlock all calculators.</p>
-          <Button onClick={() => setShowProPaywall(true)} className="bg-amber-500 hover:bg-amber-600 text-white font-semibold px-8">
+          <Button onClick={() => setShowProPaywall(true)} className="bg-teal-500 hover:bg-teal-600 text-white font-semibold px-8">
             Upgrade to Pro
           </Button>
         </div>
