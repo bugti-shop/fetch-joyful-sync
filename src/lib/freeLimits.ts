@@ -11,6 +11,8 @@ export const FREE_LIMITS = {
   maxReminders: 0,
   maxActiveChallenges: 0,
   backupSync: false,
+  maxExpenses: 10,
+  maxIncomes: 2,
 } as const;
 
 export const PREMIUM_FEATURES = {
@@ -26,4 +28,5 @@ export const PREMIUM_FEATURES = {
   customReminders: 3,
   savingsChallenges: 1,
   noAds: true,
+  unlimitedTransactions: true,
 } as const;
