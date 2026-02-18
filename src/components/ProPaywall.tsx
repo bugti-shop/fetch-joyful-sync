@@ -57,6 +57,7 @@ export const ProPaywall = ({ isOpen, onClose, featureName }: ProPaywallProps) =>
   if (!isOpen) return null;
 
   const handleContinue = () => {
+    triggerHaptic();
     if (selectedPlan === 'weekly') {
       purchaseWeekly();
     } else if (selectedPlan === 'monthly') {
