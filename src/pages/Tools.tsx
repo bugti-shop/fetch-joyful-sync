@@ -1,6 +1,8 @@
 import { useState, useEffect } from 'react';
-import { Settings, Lightbulb, TrendingDown, History, Trash2, X } from 'lucide-react';
+import { Settings, Lightbulb, TrendingDown, History, Trash2, X, Crown } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
+import { useSubscription } from '@/contexts/SubscriptionContext';
+import { ProPaywall } from '@/components/ProPaywall';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -28,6 +30,8 @@ const HISTORY_KEY = 'jarify_calc_history';
 
 const Tools = () => {
   const navigate = useNavigate();
+  const { canUseFeature } = useSubscription();
+  const [showProPaywall, setShowProPaywall] = useState(false);
   const [history, setHistory] = useState<CalculationHistory[]>([]);
   
   // Load history on mount
@@ -322,6 +326,32 @@ const Tools = () => {
       </Dialog>
     );
   };
+
+  if (!canUseFeature('advancedCalculator')) {
+    return (
+      <div className="min-h-screen bg-background pb-20">
+        <div className="sticky top-0 z-40 bg-background/95 backdrop-blur-md border-b border-border">
+          <div className="max-w-screen-xl mx-auto px-4 py-4 flex items-center justify-between">
+            <h1 className="text-2xl font-bold text-foreground">Financial Calculators</h1>
+            <button onClick={() => navigate('/settings')} className="p-2 hover:bg-accent rounded-lg transition-colors">
+              <Settings size={20} className="text-foreground" />
+            </button>
+          </div>
+        </div>
+        <div className="flex flex-col items-center justify-center px-6 py-20 text-center">
+          <div className="w-16 h-16 rounded-full bg-amber-500/10 flex items-center justify-center mb-4">
+            <Crown size={32} className="text-amber-500" />
+          </div>
+          <h2 className="text-xl font-bold text-foreground mb-2">Pro Feature</h2>
+          <p className="text-muted-foreground mb-6">Financial Calculators are available with Jarify Pro. Upgrade to unlock all calculators.</p>
+          <Button onClick={() => setShowProPaywall(true)} className="bg-amber-500 hover:bg-amber-600 text-white font-semibold px-8">
+            Upgrade to Pro
+          </Button>
+        </div>
+        <ProPaywall isOpen={showProPaywall} onClose={() => setShowProPaywall(false)} featureName="Financial Calculators" />
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-background pb-20">

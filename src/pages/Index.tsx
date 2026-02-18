@@ -303,13 +303,19 @@ const Index = () => {
 
   const createJar = async () => {
     if (newJar.name && newJar.target && categories.length > 0) {
+      // Free limit: max 2 jars
+      if (!canUseFeature('unlimitedJars') && jars.length >= 2) {
+        setPaywallFeature('Unlimited Jars');
+        setShowProPaywall(true);
+        return;
+      }
       await hapticFeedback.jarCreated();
       const targetAmount = parseFloat(newJar.target);
       const jar: Jar = {
         id: Date.now(),
         name: newJar.name,
         target: targetAmount,
-        saved: newJar.purposeType === 'debt' ? targetAmount : 0, // Debt jars start full
+        saved: newJar.purposeType === 'debt' ? targetAmount : 0,
         streak: 0,
         withdrawn: 0,
         notes: [],
@@ -330,6 +336,12 @@ const Index = () => {
 
   const createCategory = () => {
     if (newCategory.name) {
+      // Free limit: max 2 categories
+      if (!canUseFeature('unlimitedCategories') && categories.length >= 2) {
+        setPaywallFeature('Unlimited Categories');
+        setShowProPaywall(true);
+        return;
+      }
       const category: Category = {
         id: Date.now(),
         name: newCategory.name,
@@ -415,6 +427,12 @@ const Index = () => {
 
   const addNote = () => {
     if (newNote.text.trim()) {
+      // Free limit: max 2 sticky notes
+      if (!canUseFeature('unlimitedNotes') && notes.length >= 2) {
+        setPaywallFeature('Unlimited Sticky Notes');
+        setShowProPaywall(true);
+        return;
+      }
       setNotes([...notes, { id: Date.now(), text: newNote.text, color: newNote.color }]);
       setNewNote({ text: '', color: 'yellow' });
       setShowNoteModal(false);
