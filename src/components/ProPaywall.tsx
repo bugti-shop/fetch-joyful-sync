@@ -122,7 +122,7 @@ export const ProPaywall = ({ isOpen, onClose, featureName }: ProPaywallProps) =>
                 </div>
               )}
               <p className="text-white font-bold text-sm mt-1">Weekly</p>
-              <p className="text-white/60 text-[10px]">{pricing.weekly.displayPrice}</p>
+              <p className="text-white/60 text-[10px]">{pricing.weekly?.displayPrice || '$1.75/wk'}</p>
             </button>
 
             {/* Monthly */}
@@ -178,7 +178,7 @@ export const ProPaywall = ({ isOpen, onClose, featureName }: ProPaywallProps) =>
             {isLoading
               ? 'Processing...'
               : `Continue with ${selectedPlan.charAt(0).toUpperCase() + selectedPlan.slice(1)} — ${
-                  selectedPlan === 'weekly' ? pricing.weekly.displayPrice : selectedPlan === 'monthly' ? pricing.monthly.displayPrice : pricing.yearly.displayPrice
+                  selectedPlan === 'weekly' ? (pricing.weekly?.displayPrice || '$1.75/wk') : selectedPlan === 'monthly' ? pricing.monthly.displayPrice : pricing.yearly.displayPrice
                 }`}
           </Button>
 
