@@ -29,6 +29,10 @@ export const REVENUECAT_CONFIG = {
 // Google Play product IDs - must match your Google Play Console setup
 // These same IDs need to be configured in RevenueCat dashboard
 export const GOOGLE_PLAY_PRODUCTS = {
+  weekly: {
+    productId: 'jarify_wk',
+    basePlanId: 'jarify-wk',
+  },
   monthly: {
     productId: 'jarify_mo',
     basePlanId: 'jarify-mo',
@@ -43,6 +47,7 @@ export const GOOGLE_PLAY_PRODUCTS = {
 
 // Product identifiers for RevenueCat packages
 export const PRODUCT_IDS = {
+  weekly: GOOGLE_PLAY_PRODUCTS.weekly.productId,
   monthly: GOOGLE_PLAY_PRODUCTS.monthly.productId,
   yearly: GOOGLE_PLAY_PRODUCTS.yearly.productId,
 } as const;
@@ -51,6 +56,11 @@ export type PlanType = keyof typeof PRODUCT_IDS;
 
 // Pricing information interface
 export interface PricingInfo {
+  weekly: {
+    price: number;
+    currency: string;
+    displayPrice: string;
+  };
   monthly: {
     price: number;
     currency: string;
@@ -69,6 +79,11 @@ export interface PricingInfo {
 
 // Default pricing information (fallback when store unavailable)
 export const DEFAULT_PRICING: PricingInfo = {
+  weekly: {
+    price: 1.75,
+    currency: 'USD',
+    displayPrice: '$1.75/wk',
+  },
   monthly: {
     price: 2.99,
     currency: 'USD',
@@ -193,7 +208,7 @@ export const getProductInfo = async (planType: PlanType): Promise<PurchasesStore
 
     // Find package by product ID or RC package identifier
     const productId = GOOGLE_PLAY_PRODUCTS[planType].productId;
-    const rcPackageId = planType === 'monthly' ? '$rc_monthly' : '$rc_annual';
+    const rcPackageId = planType === 'weekly' ? '$rc_weekly' : planType === 'monthly' ? '$rc_monthly' : '$rc_annual';
     
     const pkg = packages.find(p => 
       p.product?.identifier === productId || 
@@ -255,7 +270,7 @@ export const purchaseByPlan = async (planType: PlanType): Promise<{
 
     // Find package by product ID (Google Play) or RC package identifier
     const productId = GOOGLE_PLAY_PRODUCTS[planType].productId;
-    const rcPackageId = planType === 'monthly' ? '$rc_monthly' : '$rc_annual';
+    const rcPackageId = planType === 'weekly' ? '$rc_weekly' : planType === 'monthly' ? '$rc_monthly' : '$rc_annual';
     
     const pkg = packages.find(p => 
       p.product?.identifier === productId || 
@@ -547,13 +562,20 @@ export const getDisplayPricing = async (): Promise<PricingInfo> => {
     const packages = await getCurrentPackages();
     if (!packages) return DEFAULT_PRICING;
 
+    const weeklyPkg = packages.find(p => p.identifier === '$rc_weekly');
     const monthlyPkg = packages.find(p => p.identifier === '$rc_monthly');
     const yearlyPkg = packages.find(p => p.identifier === '$rc_annual');
 
+    const weeklyPrice = weeklyPkg?.product?.price || DEFAULT_PRICING.weekly.price;
     const monthlyPrice = monthlyPkg?.product?.price || DEFAULT_PRICING.monthly.price;
     const yearlyPrice = yearlyPkg?.product?.price || DEFAULT_PRICING.yearly.price;
 
     return {
+      weekly: {
+        price: weeklyPrice,
+        currency: weeklyPkg?.product?.currencyCode || DEFAULT_PRICING.weekly.currency,
+        displayPrice: weeklyPkg?.product?.priceString || DEFAULT_PRICING.weekly.displayPrice,
+      },
       monthly: {
         price: monthlyPrice,
         currency: monthlyPkg?.product?.currencyCode || DEFAULT_PRICING.monthly.currency,

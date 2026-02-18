@@ -36,6 +36,7 @@ interface SubscriptionContextType {
   customerInfo: CustomerInfo | null;
   isTrialActive: boolean;
   expirationDate: Date | null;
+  purchaseWeekly: () => Promise<void>;
   purchaseMonthly: () => Promise<void>;
   purchaseYearly: () => Promise<void>;
   restorePurchases: () => Promise<void>;
@@ -150,6 +151,40 @@ export const SubscriptionProvider = ({ children }: { children: ReactNode }) => {
       console.error('Failed to refresh subscription status:', error);
     }
   }, []);
+
+  const purchaseWeekly = async () => {
+    try {
+      setIsLoading(true);
+      
+      const result = await purchaseByPlan('weekly');
+      
+      if (result.success) {
+        setTier('premium');
+        setCustomerInfo(result.customerInfo);
+        await refreshSubscriptionStatus();
+        
+        toast({
+          title: 'Welcome to Jarify Pro!',
+          description: 'Thank you for subscribing to the weekly plan.',
+        });
+      } else if (result.error !== 'cancelled') {
+        toast({
+          title: 'Purchase Failed',
+          description: result.error || 'Unable to complete purchase. Please try again.',
+          variant: 'destructive',
+        });
+      }
+    } catch (error) {
+      console.error('Purchase error:', error);
+      toast({
+        title: 'Purchase Failed',
+        description: 'Unable to complete purchase. Please try again.',
+        variant: 'destructive',
+      });
+    } finally {
+      setIsLoading(false);
+    }
+  };
 
   const purchaseMonthly = async () => {
     try {
@@ -355,6 +390,7 @@ export const SubscriptionProvider = ({ children }: { children: ReactNode }) => {
         customerInfo,
         isTrialActive,
         expirationDate,
+        purchaseWeekly,
         purchaseMonthly,
         purchaseYearly,
         restorePurchases,

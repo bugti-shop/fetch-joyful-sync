@@ -36,16 +36,18 @@ const features = [
   },
 ];
 
-type PlanOption = 'monthly' | 'yearly';
+type PlanOption = 'weekly' | 'monthly' | 'yearly';
 
 export const ProPaywall = ({ isOpen, onClose, featureName }: ProPaywallProps) => {
-  const { isLoading, purchaseMonthly, purchaseYearly, restorePurchases, pricing } = useSubscription();
+  const { isLoading, purchaseWeekly, purchaseMonthly, purchaseYearly, restorePurchases, pricing } = useSubscription();
   const [selectedPlan, setSelectedPlan] = useState<PlanOption>('yearly');
 
   if (!isOpen) return null;
 
   const handleContinue = () => {
-    if (selectedPlan === 'monthly') {
+    if (selectedPlan === 'weekly') {
+      purchaseWeekly();
+    } else if (selectedPlan === 'monthly') {
       purchaseMonthly();
     } else {
       purchaseYearly();
@@ -101,47 +103,68 @@ export const ProPaywall = ({ isOpen, onClose, featureName }: ProPaywallProps) =>
           </div>
 
           {/* Plan Selection */}
-          <div className="grid grid-cols-2 gap-3 mb-6">
+          <div className="grid grid-cols-3 gap-2 mb-6">
+            {/* Weekly */}
+            <button
+              onClick={() => setSelectedPlan('weekly')}
+              className={`relative rounded-xl p-3 text-center transition-all border-2 ${
+                selectedPlan === 'weekly'
+                  ? 'border-blue-500 bg-blue-500/10'
+                  : 'border-white/10 bg-white/5 hover:border-white/20'
+              }`}
+            >
+              <span className="absolute -top-2 left-1/2 -translate-x-1/2 px-1.5 py-0.5 bg-blue-400 rounded-full text-[8px] font-bold text-white whitespace-nowrap">
+                Try Out
+              </span>
+              {selectedPlan === 'weekly' && (
+                <div className="absolute top-2 right-2 w-4 h-4 rounded-full bg-blue-500 flex items-center justify-center">
+                  <Check size={10} className="text-white" />
+                </div>
+              )}
+              <p className="text-white font-bold text-sm mt-1">Weekly</p>
+              <p className="text-white/60 text-[10px]">{pricing.weekly.displayPrice}</p>
+            </button>
+
             {/* Monthly */}
             <button
               onClick={() => setSelectedPlan('monthly')}
-              className={`relative rounded-2xl p-4 text-center transition-all border-2 ${
+              className={`relative rounded-xl p-3 text-center transition-all border-2 ${
                 selectedPlan === 'monthly'
                   ? 'border-blue-500 bg-blue-500/10'
                   : 'border-white/10 bg-white/5 hover:border-white/20'
               }`}
             >
-              <span className="absolute -top-2.5 left-1/2 -translate-x-1/2 px-2.5 py-0.5 bg-blue-500 rounded-full text-[10px] font-bold text-white">
+              <span className="absolute -top-2 left-1/2 -translate-x-1/2 px-1.5 py-0.5 bg-blue-500 rounded-full text-[8px] font-bold text-white whitespace-nowrap">
                 Popular
               </span>
               {selectedPlan === 'monthly' && (
-                <div className="absolute top-3 right-3 w-5 h-5 rounded-full bg-blue-500 flex items-center justify-center">
-                  <Check size={12} className="text-white" />
+                <div className="absolute top-2 right-2 w-4 h-4 rounded-full bg-blue-500 flex items-center justify-center">
+                  <Check size={10} className="text-white" />
                 </div>
               )}
-              <p className="text-white font-bold text-lg mt-1">Monthly</p>
-              <p className="text-white/60 text-sm">{pricing.monthly.displayPrice}</p>
+              <p className="text-white font-bold text-sm mt-1">Monthly</p>
+              <p className="text-white/60 text-[10px]">{pricing.monthly.displayPrice}</p>
             </button>
 
             {/* Yearly */}
             <button
               onClick={() => setSelectedPlan('yearly')}
-              className={`relative rounded-2xl p-4 text-center transition-all border-2 ${
+              className={`relative rounded-xl p-3 text-center transition-all border-2 ${
                 selectedPlan === 'yearly'
                   ? 'border-blue-500 bg-blue-500/10'
                   : 'border-white/10 bg-white/5 hover:border-white/20'
               }`}
             >
-              <span className="absolute -top-2.5 left-1/2 -translate-x-1/2 px-2.5 py-0.5 bg-emerald-500 rounded-full text-[10px] font-bold text-white">
+              <span className="absolute -top-2 left-1/2 -translate-x-1/2 px-1.5 py-0.5 bg-emerald-500 rounded-full text-[8px] font-bold text-white whitespace-nowrap">
                 Best Value
               </span>
               {selectedPlan === 'yearly' && (
-                <div className="absolute top-3 right-3 w-5 h-5 rounded-full bg-blue-500 flex items-center justify-center">
-                  <Check size={12} className="text-white" />
+                <div className="absolute top-2 right-2 w-4 h-4 rounded-full bg-blue-500 flex items-center justify-center">
+                  <Check size={10} className="text-white" />
                 </div>
               )}
-              <p className="text-white font-bold text-lg mt-1">Yearly</p>
-              <p className="text-white/60 text-sm">{pricing.yearly.displayPrice}</p>
+              <p className="text-white font-bold text-sm mt-1">Yearly</p>
+              <p className="text-white/60 text-[10px]">{pricing.yearly.displayPrice}</p>
             </button>
           </div>
 
@@ -154,8 +177,8 @@ export const ProPaywall = ({ isOpen, onClose, featureName }: ProPaywallProps) =>
           >
             {isLoading
               ? 'Processing...'
-              : `Continue with ${selectedPlan === 'monthly' ? 'Monthly' : 'Yearly'} — ${
-                  selectedPlan === 'monthly' ? pricing.monthly.displayPrice : pricing.yearly.displayPrice
+              : `Continue with ${selectedPlan.charAt(0).toUpperCase() + selectedPlan.slice(1)} — ${
+                  selectedPlan === 'weekly' ? pricing.weekly.displayPrice : selectedPlan === 'monthly' ? pricing.monthly.displayPrice : pricing.yearly.displayPrice
                 }`}
           </Button>
 
