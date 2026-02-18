@@ -157,6 +157,12 @@ const Index = () => {
   const themes = ['light', 'ocean', 'forest', 'sunset', 'midnight'];
   
   const cycleTheme = () => {
+    // Dark modes are a premium feature - only 'light' is free
+    if (!canUseFeature('darkModes')) {
+      setPaywallFeature('Dark Mode & Themes');
+      setShowProPaywall(true);
+      return;
+    }
     const currentIndex = themes.indexOf(currentTheme);
     const nextIndex = (currentIndex + 1) % themes.length;
     const nextTheme = themes[nextIndex];
