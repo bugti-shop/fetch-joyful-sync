@@ -9,6 +9,9 @@ import { ExpenseProfileView } from './ExpenseProfileView';
 import { AddTransactionModal } from './AddTransactionModal';
 import { TransferModal } from './TransferModal';
 import { hapticFeedback } from '@/lib/haptics';
+import { useExpense } from '@/contexts/ExpenseContext';
+import { useSubscription } from '@/contexts/SubscriptionContext';
+import { FREE_LIMITS } from '@/lib/freeLimits';
 
 interface ExpenseMainViewProps {
   darkMode: boolean;
@@ -19,6 +22,12 @@ export const ExpenseMainView = ({ darkMode }: ExpenseMainViewProps) => {
   const [showAddModal, setShowAddModal] = useState(false);
   const [showTransferModal, setShowTransferModal] = useState(false);
   const [initialTransactionType, setInitialTransactionType] = useState<'income' | 'expense'>('expense');
+  const { expenses, incomes } = useExpense();
+  const { canUseFeature } = useSubscription();
+  const isPremium = canUseFeature('unlimited_transactions');
+
+  const remainingExpenses = Math.max(0, FREE_LIMITS.maxExpenses - expenses.length);
+  const remainingIncomes = Math.max(0, FREE_LIMITS.maxIncomes - incomes.length);
 
   const renderTabContent = () => {
     switch (activeTab) {
@@ -58,10 +67,15 @@ export const ExpenseMainView = ({ darkMode }: ExpenseMainViewProps) => {
                 setInitialTransactionType('income');
                 setShowAddModal(true);
               }}
-              className="flex-1 py-3.5 bg-emerald-500 text-white rounded-xl flex items-center justify-start gap-2 font-semibold text-sm active:scale-95 px-4"
+              className="flex-1 py-3.5 bg-emerald-500 text-white rounded-xl flex items-center justify-start gap-2 font-semibold text-sm active:scale-95 px-4 relative"
             >
               <Plus size={18} />
               <span>Add Income</span>
+              {!isPremium && (
+                <span className="absolute -top-2 -right-1 bg-white text-emerald-600 text-[10px] font-bold px-1.5 py-0.5 rounded-full shadow-sm border border-emerald-200">
+                  {remainingIncomes} left
+                </span>
+              )}
             </button>
             <button
               onClick={() => {
@@ -69,10 +83,15 @@ export const ExpenseMainView = ({ darkMode }: ExpenseMainViewProps) => {
                 setInitialTransactionType('expense');
                 setShowAddModal(true);
               }}
-              className="flex-1 py-3.5 bg-orange-500 text-white rounded-xl flex items-center justify-start gap-2 font-semibold text-sm active:scale-95 px-4"
+              className="flex-1 py-3.5 bg-orange-500 text-white rounded-xl flex items-center justify-start gap-2 font-semibold text-sm active:scale-95 px-4 relative"
             >
               <Plus size={18} />
               <span>Add Expense</span>
+              {!isPremium && (
+                <span className="absolute -top-2 -right-1 bg-white text-orange-600 text-[10px] font-bold px-1.5 py-0.5 rounded-full shadow-sm border border-orange-200">
+                  {remainingExpenses} left
+                </span>
+              )}
             </button>
           </div>
           {/* Second Row - Transfer Money */}
