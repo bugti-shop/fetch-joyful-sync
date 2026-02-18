@@ -1,5 +1,6 @@
 import { Trash2 } from 'lucide-react';
 import { useState } from 'react';
+import { hapticFeedback } from '@/lib/haptics';
 
 interface SwipeableTransactionProps {
   children: React.ReactNode;
@@ -29,6 +30,7 @@ export const SwipeableTransaction = ({ children, onDelete, id }: SwipeableTransa
   const handleTouchEnd = () => {
     setIsDragging(false);
     if (currentX < -80) {
+      hapticFeedback.medium();
       setIsDeleting(true);
       onDelete();
     }

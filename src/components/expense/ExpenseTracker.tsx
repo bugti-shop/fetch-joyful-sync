@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Plus, PieChart, BarChart3, ChevronRight, AlertCircle, Search, Download, RefreshCw } from 'lucide-react';
 import { useExpense } from '@/contexts/ExpenseContext';
+import { hapticFeedback } from '@/lib/haptics';
 import { ExpenseCategoryCard } from './ExpenseCategoryCard';
 import { ExpenseSummary } from './ExpenseSummary';
 import { ExpenseChart } from './ExpenseChart';
@@ -44,7 +45,10 @@ export const ExpenseTracker = ({ darkMode }: ExpenseTrackerProps) => {
       <div className="flex gap-2">
         <motion.button
           whileTap={{ scale: 0.95 }}
-          onClick={() => setShowSearch(true)}
+          onClick={() => {
+            hapticFeedback.light();
+            setShowSearch(true);
+          }}
           className="flex-1 bg-card border border-border rounded-xl p-3 flex items-center justify-center gap-2 text-sm font-medium text-foreground"
         >
           <Search size={16} />
@@ -52,7 +56,10 @@ export const ExpenseTracker = ({ darkMode }: ExpenseTrackerProps) => {
         </motion.button>
         <motion.button
           whileTap={{ scale: 0.95 }}
-          onClick={() => setShowRecurring(true)}
+          onClick={() => {
+            hapticFeedback.light();
+            setShowRecurring(true);
+          }}
           className="flex-1 bg-card border border-border rounded-xl p-3 flex items-center justify-center gap-2 text-sm font-medium text-foreground"
         >
           <RefreshCw size={16} />
@@ -60,7 +67,10 @@ export const ExpenseTracker = ({ darkMode }: ExpenseTrackerProps) => {
         </motion.button>
         <motion.button
           whileTap={{ scale: 0.95 }}
-          onClick={() => setShowExport(true)}
+          onClick={() => {
+            hapticFeedback.light();
+            setShowExport(true);
+          }}
           className="flex-1 bg-card border border-border rounded-xl p-3 flex items-center justify-center gap-2 text-sm font-medium text-foreground"
         >
           <Download size={16} />
@@ -97,7 +107,10 @@ export const ExpenseTracker = ({ darkMode }: ExpenseTrackerProps) => {
       <motion.button
         whileHover={{ scale: 1.02 }}
         whileTap={{ scale: 0.98 }}
-        onClick={() => setShowAddModal(true)}
+        onClick={() => {
+          hapticFeedback.medium();
+          setShowAddModal(true);
+        }}
         className="w-full bg-primary text-primary-foreground rounded-2xl p-4 flex items-center justify-center gap-2 font-semibold transition-all"
       >
         <Plus size={20} />
@@ -114,7 +127,10 @@ export const ExpenseTracker = ({ darkMode }: ExpenseTrackerProps) => {
               {(['daily', 'weekly', 'monthly'] as const).map((p) => (
                 <button
                   key={p}
-                  onClick={() => setPeriod(p)}
+                  onClick={() => {
+                    hapticFeedback.light();
+                    setPeriod(p);
+                  }}
                   className={`px-2 py-1 rounded-md text-xs font-medium transition-all ${
                     period === p 
                       ? 'bg-primary text-primary-foreground' 
@@ -129,7 +145,10 @@ export const ExpenseTracker = ({ darkMode }: ExpenseTrackerProps) => {
             {/* Chart Type Toggle */}
             <div className="flex bg-secondary rounded-lg p-0.5">
               <button
-                onClick={() => setChartType('pie')}
+                onClick={() => {
+                  hapticFeedback.light();
+                  setChartType('pie');
+                }}
                 className={`p-1.5 rounded-md transition-all ${
                   chartType === 'pie' ? 'bg-primary text-primary-foreground' : 'text-muted-foreground'
                 }`}
@@ -137,7 +156,10 @@ export const ExpenseTracker = ({ darkMode }: ExpenseTrackerProps) => {
                 <PieChart size={16} />
               </button>
               <button
-                onClick={() => setChartType('bar')}
+                onClick={() => {
+                  hapticFeedback.light();
+                  setChartType('bar');
+                }}
                 className={`p-1.5 rounded-md transition-all ${
                   chartType === 'bar' ? 'bg-primary text-primary-foreground' : 'text-muted-foreground'
                 }`}
@@ -170,7 +192,10 @@ export const ExpenseTracker = ({ darkMode }: ExpenseTrackerProps) => {
             >
               <ExpenseCategoryCard
                 category={category}
-                onClick={() => setSelectedCategory(category.id)}
+                onClick={() => {
+                  hapticFeedback.light();
+                  setSelectedCategory(category.id);
+                }}
               />
             </motion.div>
           ))}

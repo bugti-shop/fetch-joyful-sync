@@ -1,5 +1,6 @@
 import { Search, ChevronDown, ChevronRight, ArrowUpDown, Wallet, CreditCard, Receipt, Briefcase, ShoppingBag, UtensilsCrossed, Pencil, Target, BellRing, PiggyBank, LayoutDashboard, Image } from 'lucide-react';
 import { useState, useEffect } from 'react';
+import { hapticFeedback } from '@/lib/haptics';
 import { useExpense } from '@/contexts/ExpenseContext';
 import { format, isToday, isYesterday, isSameDay, startOfMonth, endOfMonth, subMonths } from 'date-fns';
 import { ExpenseSearch } from './ExpenseSearch';
@@ -266,7 +267,10 @@ export const ExpenseHomeView = () => {
       {/* Header with Cash Flow - Reduced spacing */}
       <div className="text-center relative px-2 -mt-1">
         <button 
-          onClick={() => setShowSearch(true)}
+          onClick={() => {
+            hapticFeedback.light();
+            setShowSearch(true);
+          }}
           className="absolute right-2 top-0 p-1.5 text-muted-foreground hover:text-foreground"
         >
           <Search size={20} />
@@ -302,12 +306,15 @@ export const ExpenseHomeView = () => {
                   
                   const handleDelete = () => {
                     if (tx.type === 'expense') {
+                      hapticFeedback.medium();
                       deleteExpense(tx.id);
                       toast({ title: 'Expense deleted', description: 'Transaction removed' });
                     } else if (tx.type === 'income') {
+                      hapticFeedback.medium();
                       deleteIncome(tx.id);
                       toast({ title: 'Income deleted', description: 'Transaction removed' });
                     } else if (tx.type === 'transfer') {
+                      hapticFeedback.medium();
                       const savedTransfers = localStorage.getItem('jarify_transfers');
                       if (savedTransfers) {
                         const updatedTransfers = JSON.parse(savedTransfers).filter((t: any) => t.id !== tx.id);
@@ -319,6 +326,7 @@ export const ExpenseHomeView = () => {
                   };
                   
                   const handleTap = () => {
+                    hapticFeedback.light();
                     setSelectedTransaction(tx);
                   };
                   

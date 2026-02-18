@@ -5,6 +5,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { hapticFeedback } from '@/lib/haptics';
 import { TransferHistory } from './TransferHistory';
 
 export interface Account {
@@ -88,6 +89,7 @@ export const AccountsManager = () => {
     };
     
     setAccounts(prev => [...prev, account]);
+    hapticFeedback.success();
     setNewAccount({ name: '', type: 'cash', balance: '', icon: '💵' });
     setShowAddModal(false);
   };
@@ -97,16 +99,21 @@ export const AccountsManager = () => {
     setAccounts(prev => prev.map(acc => 
       acc.id === editingAccount.id ? editingAccount : acc
     ));
+    hapticFeedback.success();
     setEditingAccount(null);
   };
 
   const deleteAccount = (id: string) => {
+    hapticFeedback.medium();
     setAccounts(prev => prev.filter(acc => acc.id !== id));
   };
 
   return (
     <div className="space-y-4 pb-24">
-      <Tabs value={activeTab} onValueChange={setActiveTab}>
+      <Tabs value={activeTab} onValueChange={(val) => {
+        hapticFeedback.light();
+        setActiveTab(val);
+      }}>
         <TabsList className="grid w-full grid-cols-2">
           <TabsTrigger value="accounts" className="flex items-center gap-2">
             <Wallet size={16} />
@@ -142,7 +149,10 @@ export const AccountsManager = () => {
             </div>
           </div>
 
-          <Button onClick={() => setShowAddModal(true)} className="w-full" variant="outline">
+          <Button onClick={() => {
+            hapticFeedback.medium();
+            setShowAddModal(true);
+          }} className="w-full" variant="outline">
             <Plus size={18} className="mr-2" />
             Add Account
           </Button>
@@ -174,7 +184,10 @@ export const AccountsManager = () => {
                   </div>
                   <div className="flex items-center justify-end gap-2 mt-2 pt-2 border-t border-border">
                     <button
-                      onClick={() => setEditingAccount(account)}
+                      onClick={() => {
+                        hapticFeedback.light();
+                        setEditingAccount(account);
+                      }}
                       className="p-2 hover:bg-secondary rounded-lg text-xs flex items-center gap-1 text-muted-foreground"
                     >
                       <Edit2 size={14} />
@@ -228,7 +241,10 @@ export const AccountsManager = () => {
                 {accountIcons.map((item) => (
                   <button
                     key={item.id}
-                    onClick={() => setNewAccount(prev => ({ ...prev, icon: item.icon }))}
+                    onClick={() => {
+                      hapticFeedback.light();
+                      setNewAccount(prev => ({ ...prev, icon: item.icon }));
+                    }}
                     className={`p-3 rounded-lg text-2xl ${
                       newAccount.icon === item.icon
                         ? 'bg-primary/20 ring-2 ring-primary'
@@ -275,7 +291,10 @@ export const AccountsManager = () => {
                   {accountIcons.map((item) => (
                     <button
                       key={item.id}
-                      onClick={() => setEditingAccount(prev => prev ? { ...prev, icon: item.icon } : null)}
+                      onClick={() => {
+                        hapticFeedback.light();
+                        setEditingAccount(prev => prev ? { ...prev, icon: item.icon } : null);
+                      }}
                       className={`p-3 rounded-lg text-2xl ${
                         editingAccount.icon === item.icon
                           ? 'bg-primary/20 ring-2 ring-primary'

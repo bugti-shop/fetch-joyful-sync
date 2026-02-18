@@ -2,6 +2,7 @@ import { useState, useMemo, useEffect } from 'react';
 import { ChevronLeft, ChevronRight, ChevronDown, ChevronUp, Calendar as CalendarIcon, X, CalendarDays } from 'lucide-react';
 import { format, subMonths, addMonths, startOfMonth, endOfMonth, eachDayOfInterval, isSameDay, isSameMonth, startOfWeek, endOfWeek, getDay } from 'date-fns';
 import { useExpense } from '@/contexts/ExpenseContext';
+import { hapticFeedback } from '@/lib/haptics';
 import { formatCurrency } from '@/lib/utils';
 import { PieChart, Pie, Cell, ResponsiveContainer } from 'recharts';
 import { motion, AnimatePresence } from 'framer-motion';
@@ -66,10 +67,12 @@ export const ExpenseStatsView = () => {
   const totalAccountsBalance = accounts.reduce((sum, acc) => sum + acc.balance, 0);
 
   const goToPreviousMonth = () => {
+    hapticFeedback.light();
     setCurrentDate(prev => subMonths(prev, 1));
   };
 
   const goToNextMonth = () => {
+    hapticFeedback.light();
     setCurrentDate(prev => addMonths(prev, 1));
   };
 
@@ -237,7 +240,7 @@ export const ExpenseStatsView = () => {
         <div>
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
-              <button className="flex items-center gap-1 text-sm text-muted-foreground hover:text-foreground transition-colors">
+              <button onClick={() => hapticFeedback.light()} className="flex items-center gap-1 text-sm text-muted-foreground hover:text-foreground transition-colors">
                 {selectedAccount ? (
                   <>
                     <span>{selectedAccount.icon}</span>
@@ -282,7 +285,7 @@ export const ExpenseStatsView = () => {
           
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
-              <button className="flex items-center gap-1 text-2xl font-bold text-foreground hover:opacity-80 transition-opacity">
+              <button onClick={() => hapticFeedback.light()} className="flex items-center gap-1 text-2xl font-bold text-foreground hover:opacity-80 transition-opacity">
                 ${formatCurrency(selectedAccount ? selectedAccount.balance : (balanceView === 'total' ? allTimeBalance : balanceView === 'income' ? allTimeIncome : allTimeExpense))}
                 <ChevronDown size={20} className="text-muted-foreground" />
               </button>
@@ -315,7 +318,10 @@ export const ExpenseStatsView = () => {
         
         <div className="flex items-center gap-2">
           <button 
-            onClick={() => setShowCalendar(!showCalendar)}
+            onClick={() => {
+              hapticFeedback.light();
+              setShowCalendar(!showCalendar);
+            }}
             className={`p-2 rounded-lg transition-colors ${showCalendar ? 'bg-primary text-primary-foreground' : 'bg-secondary'}`}
           >
             <CalendarDays size={20} className={showCalendar ? 'text-primary-foreground' : 'text-foreground'} />
@@ -338,7 +344,10 @@ export const ExpenseStatsView = () => {
               {format(currentDate, 'MMM yyyy')}
             </h2>
             <button
-              onClick={() => setShowCalendar(!showCalendar)}
+              onClick={() => {
+                hapticFeedback.light();
+                setShowCalendar(!showCalendar);
+              }}
               className="p-1.5 hover:bg-secondary rounded-lg transition-colors"
             >
               <CalendarIcon size={18} className="text-muted-foreground" />
@@ -389,7 +398,10 @@ export const ExpenseStatsView = () => {
             <div className="flex items-center justify-between mb-4">
               <h3 className="text-lg font-bold text-foreground">Calendar</h3>
               <button
-                onClick={() => setShowCalendar(false)}
+                onClick={() => {
+                  hapticFeedback.light();
+                  setShowCalendar(false);
+                }}
                 className="p-1 hover:bg-secondary rounded-lg transition-colors"
               >
                 <X size={18} className="text-muted-foreground" />

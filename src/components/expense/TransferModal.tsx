@@ -367,7 +367,10 @@ export const TransferModal = ({ isOpen, onClose }: TransferModalProps) => {
             {/* Footer */}
             <div className="sticky bottom-0 bg-background border-t border-border p-4">
               <button
-                onClick={handleSubmit}
+                onClick={() => {
+                  hapticFeedback.medium();
+                  handleSubmit();
+                }}
                 className="w-full py-3.5 bg-primary text-primary-foreground rounded-xl font-semibold text-sm active:scale-[0.98] transition-transform"
               >
                 Transfer
