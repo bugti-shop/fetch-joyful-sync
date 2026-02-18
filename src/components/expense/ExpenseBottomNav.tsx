@@ -1,7 +1,7 @@
-import { Home, BarChart3, Wallet, Settings } from 'lucide-react';
+import { Home, BarChart3, Wallet, Settings, User } from 'lucide-react';
 import { hapticFeedback } from '@/lib/haptics';
 
-export type ExpenseTab = 'home' | 'stats' | 'accounts' | 'settings';
+export type ExpenseTab = 'home' | 'stats' | 'accounts' | 'profile' | 'settings';
 
 interface ExpenseBottomNavProps {
   activeTab: ExpenseTab;
@@ -13,6 +13,7 @@ export const ExpenseBottomNav = ({ activeTab, onTabChange }: ExpenseBottomNavPro
     { id: 'home' as ExpenseTab, label: 'Home', icon: Home },
     { id: 'stats' as ExpenseTab, label: 'Stats', icon: BarChart3 },
     { id: 'accounts' as ExpenseTab, label: 'Accounts', icon: Wallet },
+    { id: 'profile' as ExpenseTab, label: 'Profile', icon: User },
     { id: 'settings' as ExpenseTab, label: 'Settings', icon: Settings },
   ];
 

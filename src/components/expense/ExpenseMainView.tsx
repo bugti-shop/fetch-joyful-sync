@@ -5,6 +5,7 @@ import { ExpenseHomeView } from './ExpenseHomeView';
 import { ExpenseStatsView } from './ExpenseStatsView';
 import { AccountsManager } from './AccountsManager';
 import { ExpenseSettingsView } from './ExpenseSettingsView';
+import { ExpenseProfileView } from './ExpenseProfileView';
 import { AddTransactionModal } from './AddTransactionModal';
 import { TransferModal } from './TransferModal';
 import { hapticFeedback } from '@/lib/haptics';
@@ -27,6 +28,8 @@ export const ExpenseMainView = ({ darkMode }: ExpenseMainViewProps) => {
         return <ExpenseStatsView />;
       case 'accounts':
         return <AccountsManager />;
+      case 'profile':
+        return <ExpenseProfileView />;
       case 'settings':
         return <ExpenseSettingsView />;
       default:
