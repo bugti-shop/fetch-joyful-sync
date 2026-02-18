@@ -588,7 +588,7 @@ const Index = () => {
       )}
 
       {/* Glassmorphism Header */}
-      <div className="sticky top-0 z-30 mb-4 bg-background/90 backdrop-blur-md border-b border-border transform-gpu">
+      <div className="sticky top-0 z-30 mb-4 bg-background border-b border-border transform-gpu">
         <div className="max-w-[1400px] mx-auto px-4 sm:px-6 py-2">
           <div className="flex justify-between items-center">
             <div className="flex items-center gap-2">

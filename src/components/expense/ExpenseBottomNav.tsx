@@ -29,7 +29,7 @@ export const ExpenseBottomNav = ({ activeTab, onTabChange }: ExpenseBottomNavPro
   ];
 
   return (
-    <div className="fixed bottom-0 left-0 right-0 z-50 bg-card border-t border-border safe-area-bottom">
+    <div className="fixed bottom-0 left-0 right-0 z-50 bg-background border-t border-border safe-area-bottom">
       <div className="flex items-center justify-around py-1 px-4 max-w-lg mx-auto">
         {tabs.map((tab) => {
           const isActive = activeTab === tab.id;
