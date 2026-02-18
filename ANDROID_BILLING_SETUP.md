@@ -128,7 +128,58 @@ npx cap run android
 
 ## Google Sign-In Setup (Capgo Social Login)
 
-### Step 1: Add `strings.xml`
+### Step 1: Full `MainActivity.java`
+
+Replace `android/app/src/main/java/com/jarify/app/MainActivity.java` with the full code below:
+
+```java
+package com.jarify.app;
+
+import android.content.Intent;
+import android.os.Bundle;
+import android.util.Log;
+
+import com.getcapacitor.BridgeActivity;
+import com.getcapacitor.PluginHandle;
+
+import ee.forgr.capacitor.social.login.GoogleProvider;
+import ee.forgr.capacitor.social.login.SocialLoginPlugin;
+import ee.forgr.capacitor.social.login.ModifiedMainActivityForSocialLoginPlugin;
+
+public class MainActivity extends BridgeActivity implements ModifiedMainActivityForSocialLoginPlugin {
+
+    private static final String TAG = "MainActivity";
+
+    @Override
+    public void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+
+        // Register Capgo Social Login Plugin
+        registerPlugin(SocialLoginPlugin.class);
+
+        Log.d(TAG, "MainActivity created with SocialLogin plugin registered");
+    }
+
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+
+        // Forward Google Sign-In result to the SocialLogin plugin
+        if (requestCode >= GoogleProvider.REQUEST_AUTHORIZE_GOOGLE_MIN
+                && requestCode < GoogleProvider.REQUEST_AUTHORIZE_GOOGLE_MAX) {
+
+            PluginHandle pluginHandle = getBridge().getPlugin("SocialLogin");
+            if (pluginHandle != null) {
+                SocialLoginPlugin plugin = (SocialLoginPlugin) pluginHandle.getInstance();
+                plugin.handleGoogleLoginIntent(requestCode, data);
+                Log.d(TAG, "Google Sign-In result forwarded to SocialLoginPlugin");
+            }
+        }
+    }
+}
+```
+
+### Step 2: Add `strings.xml`
 
 Create or update `android/app/src/main/res/values/strings.xml`:
 
@@ -143,7 +194,7 @@ Create or update `android/app/src/main/res/values/strings.xml`:
 </resources>
 ```
 
-### Step 2: Update `AndroidManifest.xml`
+### Step 3: Update `AndroidManifest.xml`
 
 Ensure the following permissions and intent filters are in `android/app/src/main/AndroidManifest.xml`:
 
@@ -172,7 +223,7 @@ Ensure the following permissions and intent filters are in `android/app/src/main
 </application>
 ```
 
-### Step 3: Sync and Build
+### Step 4: Sync and Build
 
 ```bash
 npm install
@@ -183,4 +234,4 @@ cd ..
 npx cap run android
 ```
 
-> **Note:** Google Sign-In scopes are configured in `capacitor.config.ts` and `src/lib/googleAuth.ts`. No need to define them in Android XML resources.
+> **Note:** Google Sign-In scopes (email, profile, openid, drive.file, drive.appdata) are configured in `capacitor.config.ts` and requested at runtime in `src/lib/googleAuth.ts`. The `MainActivity` implements `ModifiedMainActivityForSocialLoginPlugin` and forwards `onActivityResult` to handle the native Google Sign-In callback properly.
