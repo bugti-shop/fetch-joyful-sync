@@ -1,7 +1,13 @@
 import { createContext, useContext, useState, useEffect, useCallback, ReactNode } from 'react';
 import { useGoogleAuth } from '@/contexts/GoogleAuthContext';
-import { performFullSync, uploadToDrive, getLastSyncTime } from '@/lib/driveSync';
+import { performFullSync, uploadToDrive, getLastSyncTime, type SyncData, type SyncResult } from '@/lib/driveSync';
 import { useToast } from '@/hooks/use-toast';
+
+interface ConflictState {
+  isOpen: boolean;
+  remoteData?: SyncData;
+  localData?: SyncData;
+}
 
 interface SyncContextType {
   isSyncing: boolean;
@@ -9,6 +15,9 @@ interface SyncContextType {
   syncNow: () => Promise<void>;
   autoSyncEnabled: boolean;
   setAutoSyncEnabled: (enabled: boolean) => void;
+  conflict: ConflictState;
+  resolveConflict: (choice: 'keep_local' | 'keep_remote' | 'merge') => Promise<void>;
+  dismissConflict: () => void;
 }
 
 const SyncContext = createContext<SyncContextType | undefined>(undefined);
@@ -20,12 +29,47 @@ export const SyncProvider = ({ children }: { children: ReactNode }) => {
   const [autoSyncEnabled, setAutoSyncEnabled] = useState(() => {
     return localStorage.getItem('jarify_auto_sync') !== 'false';
   });
+  const [conflict, setConflict] = useState<ConflictState>({ isOpen: false });
   const { toast } = useToast();
 
-  // Save auto-sync preference
   useEffect(() => {
     localStorage.setItem('jarify_auto_sync', String(autoSyncEnabled));
   }, [autoSyncEnabled]);
+
+  const handleSyncResult = useCallback((result: SyncResult) => {
+    if (result.direction === 'conflict') {
+      setConflict({
+        isOpen: true,
+        remoteData: result.remoteData,
+        localData: result.localData,
+      });
+      return;
+    }
+
+    if (result.success) {
+      setLastSynced(getLastSyncTime());
+      const messages: Record<string, string> = {
+        uploaded: 'Your data has been backed up to Google Drive.',
+        downloaded: 'Your data has been restored from Google Drive.',
+        merged: 'Your data has been merged successfully.',
+        none: 'Sync completed.',
+      };
+      toast({
+        title: 'Sync Complete ✅',
+        description: messages[result.direction],
+      });
+
+      if (result.direction === 'downloaded' || result.direction === 'merged') {
+        setTimeout(() => window.location.reload(), 1500);
+      }
+    } else {
+      toast({
+        title: 'Sync Failed',
+        description: 'Could not sync with Google Drive. Please try again.',
+        variant: 'destructive',
+      });
+    }
+  }, [toast]);
 
   const syncNow = useCallback(async () => {
     if (!isSignedIn || !user?.accessToken) {
@@ -40,31 +84,7 @@ export const SyncProvider = ({ children }: { children: ReactNode }) => {
     try {
       setIsSyncing(true);
       const result = await performFullSync(user.accessToken);
-
-      if (result.success) {
-        setLastSynced(getLastSyncTime());
-        const messages: Record<string, string> = {
-          uploaded: 'Your data has been backed up to Google Drive.',
-          downloaded: 'Your data has been restored from Google Drive.',
-          merged: 'Your data has been synced with Google Drive.',
-          none: 'Sync completed.',
-        };
-        toast({
-          title: 'Sync Complete ✅',
-          description: messages[result.direction],
-        });
-
-        // Reload page if data was downloaded to refresh all contexts
-        if (result.direction === 'downloaded') {
-          setTimeout(() => window.location.reload(), 1500);
-        }
-      } else {
-        toast({
-          title: 'Sync Failed',
-          description: 'Could not sync with Google Drive. Please try again.',
-          variant: 'destructive',
-        });
-      }
+      handleSyncResult(result);
     } catch (error) {
       console.error('Sync error:', error);
       toast({
@@ -75,20 +95,43 @@ export const SyncProvider = ({ children }: { children: ReactNode }) => {
     } finally {
       setIsSyncing(false);
     }
-  }, [isSignedIn, user, toast]);
+  }, [isSignedIn, user, toast, handleSyncResult]);
+
+  const resolveConflict = useCallback(async (choice: 'keep_local' | 'keep_remote' | 'merge') => {
+    if (!user?.accessToken) return;
+
+    try {
+      setIsSyncing(true);
+      setConflict({ isOpen: false });
+      const result = await performFullSync(user.accessToken, choice);
+      handleSyncResult(result);
+    } catch (error) {
+      console.error('Conflict resolution error:', error);
+      toast({
+        title: 'Resolution Failed',
+        description: 'Could not resolve sync conflict. Please try again.',
+        variant: 'destructive',
+      });
+    } finally {
+      setIsSyncing(false);
+    }
+  }, [user, handleSyncResult, toast]);
+
+  const dismissConflict = useCallback(() => {
+    setConflict({ isOpen: false });
+  }, []);
 
   // Auto-sync on sign-in
   useEffect(() => {
     if (isSignedIn && user?.accessToken && autoSyncEnabled) {
-      // Delay to let app fully load
       const timer = setTimeout(() => {
         syncNow();
       }, 2000);
       return () => clearTimeout(timer);
     }
-  }, [isSignedIn]); // Only trigger on sign-in state change
+  }, [isSignedIn]);
 
-  // Auto-sync periodically (every 5 minutes while signed in)
+  // Auto-sync periodically (every 5 minutes)
   useEffect(() => {
     if (!isSignedIn || !user?.accessToken || !autoSyncEnabled) return;
 
@@ -101,7 +144,7 @@ export const SyncProvider = ({ children }: { children: ReactNode }) => {
           console.error('Auto-sync error:', error);
         }
       }
-    }, 5 * 60 * 1000); // 5 minutes
+    }, 5 * 60 * 1000);
 
     return () => clearInterval(interval);
   }, [isSignedIn, user?.accessToken, autoSyncEnabled, isSyncing]);
@@ -114,6 +157,9 @@ export const SyncProvider = ({ children }: { children: ReactNode }) => {
         syncNow,
         autoSyncEnabled,
         setAutoSyncEnabled,
+        conflict,
+        resolveConflict,
+        dismissConflict,
       }}
     >
       {children}
