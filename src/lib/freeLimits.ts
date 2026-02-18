@@ -1,9 +1,9 @@
 // Free tier limitations
 export const FREE_LIMITS = {
-  maxJars: 4,
+  maxJars: 2,
   maxCategories: 2,
   transactionHistoryDays: 30,
-  maxStickyNotes: 3,
+  maxStickyNotes: 2,
   maxCurrencies: 1,
   defaultCurrency: '€',
   darkModes: 0,

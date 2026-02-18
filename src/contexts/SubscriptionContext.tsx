@@ -53,10 +53,10 @@ interface SubscriptionContextType {
 const SubscriptionContext = createContext<SubscriptionContextType | undefined>(undefined);
 
 const FREE_LIMITS = {
-  maxJars: 5,
+  maxJars: 2,
   maxCategories: 2,
   transactionHistoryDays: 30,
-  maxStickyNotes: 5,
+  maxStickyNotes: 2,
   maxCurrencies: 1,
   darkModes: 0,
   calculatorModes: ['monthly'],
