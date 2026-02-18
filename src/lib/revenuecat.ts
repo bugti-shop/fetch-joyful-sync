@@ -95,7 +95,7 @@ export const DEFAULT_PRICING: PricingInfo = {
     pricePerMonth: 1.99,
     currency: 'USD',
     displayPrice: '$1.99/mo',
-    displayYearlyPrice: '$23.88/year',
+    displayYearlyPrice: '$23.88/yr',
     savings: 12.00,
   },
 };
