@@ -1,22 +1,7 @@
 import { useState } from 'react';
-import { Crown, Check, Sparkles, Gift, X } from 'lucide-react';
+import { Crown, Lock, Bell, MapPin, X, Check } from 'lucide-react';
 import { Button } from './ui/button';
-import { Badge } from './ui/badge';
 import { useSubscription } from '@/contexts/SubscriptionContext';
-
-const premiumFeatures = [
-  'Unlimited jars & categories',
-  'Debt/Loan tracking jars',
-  'Image jars (Photo Circle)',
-  'All currency symbols',
-  'Investment plan insights',
-  'All dark modes',
-  'Advanced calculator',
-  'Backup & restore',
-  'Unlimited sticky notes',
-  'Savings trends & analytics',
-  'No ads',
-];
 
 interface ProPaywallProps {
   isOpen: boolean;
@@ -24,109 +9,165 @@ interface ProPaywallProps {
   featureName?: string;
 }
 
+const features = [
+  {
+    icon: Lock,
+    iconBg: 'bg-blue-500',
+    title: 'Unlock All Features',
+    description: 'Dark mode, custom currencies, and more',
+  },
+  {
+    icon: Bell,
+    iconBg: 'bg-blue-400',
+    title: 'Unlimited Everything',
+    description: 'Unlimited jars, categories, and notes',
+  },
+  {
+    icon: Crown,
+    iconBg: 'bg-indigo-500',
+    title: 'Pro Member',
+    description: 'Get access to all current and future features',
+  },
+  {
+    icon: MapPin,
+    iconBg: 'bg-pink-400',
+    title: 'Investment Insights',
+    description: 'Daily, weekly & monthly saving plans',
+  },
+];
+
+type PlanOption = 'monthly' | 'yearly';
+
 export const ProPaywall = ({ isOpen, onClose, featureName }: ProPaywallProps) => {
   const { isLoading, purchaseMonthly, purchaseYearly, restorePurchases, pricing } = useSubscription();
+  const [selectedPlan, setSelectedPlan] = useState<PlanOption>('yearly');
 
   if (!isOpen) return null;
 
+  const handleContinue = () => {
+    if (selectedPlan === 'monthly') {
+      purchaseMonthly();
+    } else {
+      purchaseYearly();
+    }
+  };
+
   return (
-    <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center p-4 z-50 overflow-y-auto">
-      <div className="bg-card rounded-3xl p-6 max-w-md w-full shadow-2xl my-8 max-h-[90vh] overflow-y-auto relative">
+    <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center">
+      {/* Backdrop */}
+      <div className="absolute inset-0 bg-black/50 backdrop-blur-sm" onClick={onClose} />
+
+      {/* Modal */}
+      <div className="relative w-full max-w-md bg-[#1a1a2e] rounded-t-3xl sm:rounded-3xl max-h-[92vh] overflow-y-auto">
         {/* Close Button */}
         <button
           onClick={onClose}
-          className="absolute top-4 right-4 p-1.5 rounded-full hover:bg-accent transition-colors"
+          className="absolute top-4 right-4 z-10 w-9 h-9 rounded-full bg-white/10 flex items-center justify-center hover:bg-white/20 transition-colors"
         >
-          <X size={20} className="text-muted-foreground" />
+          <X size={18} className="text-white/70" />
         </button>
 
-        {/* Header */}
-        <div className="text-center mb-6">
-          <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-amber-100 dark:bg-amber-900/30 mb-3">
-            <Crown className="h-8 w-8 text-amber-500" />
-          </div>
-          <h2 className="text-2xl font-bold text-foreground">Upgrade to Pro</h2>
+        <div className="px-6 pt-10 pb-8">
+          {/* Header */}
+          <h2 className="text-3xl font-bold text-white text-center mb-2">Upgrade to Pro</h2>
           {featureName && (
-            <p className="text-sm text-muted-foreground mt-1">
-              <span className="font-medium text-amber-600">{featureName}</span> is a Pro feature
+            <p className="text-center text-blue-400 text-sm mb-6">
+              {featureName} is a Pro feature
             </p>
           )}
-        </div>
+          {!featureName && <div className="mb-6" />}
 
-        {/* Features */}
-        <div className="space-y-2.5 mb-6">
-          {premiumFeatures.map((feature, index) => (
-            <div key={index} className="flex items-center gap-3">
-              <div className="flex h-5 w-5 items-center justify-center rounded-full bg-amber-500/10">
-                <Check className="h-3 w-3 text-amber-600" />
-              </div>
-              <span className="text-sm text-foreground/90">{feature}</span>
+          {/* Features List with Timeline */}
+          <div className="relative mb-8">
+            {/* Timeline line */}
+            <div className="absolute left-6 top-6 bottom-6 w-0.5 bg-gradient-to-b from-blue-500 via-indigo-500 to-pink-400" />
+
+            <div className="space-y-5">
+              {features.map((feature, index) => {
+                const Icon = feature.icon;
+                return (
+                  <div key={index} className="flex items-start gap-4 relative">
+                    <div className={`w-12 h-12 rounded-full ${feature.iconBg} flex items-center justify-center flex-shrink-0 z-10 shadow-lg`}>
+                      <Icon size={20} className="text-white" />
+                    </div>
+                    <div className="pt-1">
+                      <h3 className="text-white font-semibold text-base">{feature.title}</h3>
+                      <p className="text-white/50 text-sm">{feature.description}</p>
+                    </div>
+                  </div>
+                );
+              })}
             </div>
-          ))}
-        </div>
-
-        {/* Free Trial */}
-        <div className="flex items-center gap-3 rounded-xl bg-emerald-500/10 p-3 border border-emerald-500/30 mb-4">
-          <Gift className="h-5 w-5 text-emerald-600 flex-shrink-0" />
-          <p className="text-sm font-medium text-foreground">Start with a free trial!</p>
-        </div>
-
-        {/* Pricing */}
-        <div className="space-y-3 mb-4">
-          <div className="rounded-xl border-2 border-amber-500 bg-amber-500/5 p-4">
-            <div className="flex items-baseline justify-between mb-3">
-              <div>
-                <p className="text-sm font-medium text-muted-foreground">Yearly</p>
-                <div className="flex items-baseline gap-1">
-                  <span className="text-3xl font-bold text-foreground">{pricing.yearly.displayPrice}</span>
-                  <span className="text-sm text-muted-foreground">billed yearly</span>
-                </div>
-                <p className="mt-1 text-xs text-amber-600 font-medium">
-                  Save ${pricing.yearly.savings.toFixed(2)}!
-                </p>
-              </div>
-              <Badge className="bg-amber-500 text-white border-0">Best Value</Badge>
-            </div>
-            <Button
-              onClick={() => purchaseYearly()}
-              disabled={isLoading}
-              className="w-full bg-amber-500 hover:bg-amber-600 text-white"
-              size="lg"
-            >
-              {isLoading ? 'Processing...' : 'Start Free Trial'}
-            </Button>
           </div>
 
-          <div className="rounded-xl border-2 border-border bg-card p-4">
-            <div className="flex items-baseline justify-between mb-3">
-              <div>
-                <p className="text-sm font-medium text-muted-foreground">Monthly</p>
-                <div className="flex items-baseline gap-1">
-                  <span className="text-3xl font-bold text-foreground">{pricing.monthly.displayPrice}</span>
-                </div>
-              </div>
-              <Badge variant="secondary">Popular</Badge>
-            </div>
-            <Button
-              onClick={() => purchaseMonthly()}
-              disabled={isLoading}
-              className="w-full"
-              size="lg"
-              variant="outline"
+          {/* Plan Selection */}
+          <div className="grid grid-cols-2 gap-3 mb-6">
+            {/* Monthly */}
+            <button
+              onClick={() => setSelectedPlan('monthly')}
+              className={`relative rounded-2xl p-4 text-center transition-all border-2 ${
+                selectedPlan === 'monthly'
+                  ? 'border-blue-500 bg-blue-500/10'
+                  : 'border-white/10 bg-white/5 hover:border-white/20'
+              }`}
             >
-              {isLoading ? 'Processing...' : 'Start Free Trial'}
-            </Button>
-          </div>
-        </div>
+              <span className="absolute -top-2.5 left-1/2 -translate-x-1/2 px-2.5 py-0.5 bg-blue-500 rounded-full text-[10px] font-bold text-white">
+                Popular
+              </span>
+              {selectedPlan === 'monthly' && (
+                <div className="absolute top-3 right-3 w-5 h-5 rounded-full bg-blue-500 flex items-center justify-center">
+                  <Check size={12} className="text-white" />
+                </div>
+              )}
+              <p className="text-white font-bold text-lg mt-1">Monthly</p>
+              <p className="text-white/60 text-sm">{pricing.monthly.displayPrice}</p>
+            </button>
 
-        <Button
-          onClick={restorePurchases}
-          variant="ghost"
-          className="w-full"
-          disabled={isLoading}
-        >
-          Restore Purchases
-        </Button>
+            {/* Yearly */}
+            <button
+              onClick={() => setSelectedPlan('yearly')}
+              className={`relative rounded-2xl p-4 text-center transition-all border-2 ${
+                selectedPlan === 'yearly'
+                  ? 'border-blue-500 bg-blue-500/10'
+                  : 'border-white/10 bg-white/5 hover:border-white/20'
+              }`}
+            >
+              <span className="absolute -top-2.5 left-1/2 -translate-x-1/2 px-2.5 py-0.5 bg-emerald-500 rounded-full text-[10px] font-bold text-white">
+                Best Value
+              </span>
+              {selectedPlan === 'yearly' && (
+                <div className="absolute top-3 right-3 w-5 h-5 rounded-full bg-blue-500 flex items-center justify-center">
+                  <Check size={12} className="text-white" />
+                </div>
+              )}
+              <p className="text-white font-bold text-lg mt-1">Yearly</p>
+              <p className="text-white/60 text-sm">{pricing.yearly.displayPrice}</p>
+            </button>
+          </div>
+
+          {/* CTA Button */}
+          <Button
+            onClick={handleContinue}
+            disabled={isLoading}
+            className="w-full py-6 rounded-2xl bg-blue-500 hover:bg-blue-600 text-white font-bold text-base shadow-lg shadow-blue-500/25"
+            size="lg"
+          >
+            {isLoading
+              ? 'Processing...'
+              : `Continue with ${selectedPlan === 'monthly' ? 'Monthly' : 'Yearly'} — ${
+                  selectedPlan === 'monthly' ? pricing.monthly.displayPrice : pricing.yearly.displayPrice
+                }`}
+          </Button>
+
+          {/* Restore */}
+          <button
+            onClick={restorePurchases}
+            disabled={isLoading}
+            className="w-full text-center text-blue-400 text-sm font-medium mt-4 py-2 hover:text-blue-300 transition-colors"
+          >
+            Restore Purchase
+          </button>
+        </div>
       </div>
     </div>
   );
