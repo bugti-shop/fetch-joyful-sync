@@ -985,7 +985,14 @@ const Index = () => {
               <SavingsButton onClick={() => setShowJarNoteModal(true)} size="default" className="text-sm sm:text-base whitespace-nowrap">
                 Add Notes
               </SavingsButton>
-              <SavingsButton onClick={() => setShowRecordsModal(true)} variant="secondary" size="default" className="text-sm sm:text-base whitespace-nowrap">
+              <SavingsButton onClick={() => {
+                if (!canUseFeature('investment_plan')) {
+                  setPaywallFeature('Transaction Records');
+                  setShowProPaywall(true);
+                } else {
+                  setShowRecordsModal(true);
+                }
+              }} variant="secondary" size="default" className="text-sm sm:text-base whitespace-nowrap">
                 📊 Records
               </SavingsButton>
             </div>
