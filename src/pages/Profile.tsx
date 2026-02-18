@@ -20,7 +20,7 @@ const Profile = () => {
   return (
     <div className="min-h-screen bg-background pb-24">
       {/* Header */}
-      <div className="sticky top-0 z-30 bg-background/90 backdrop-blur-md border-b border-border">
+      <div className="sticky top-0 z-30 bg-background border-b border-border">
         <div className="max-w-screen-xl mx-auto px-4 py-4">
           <h1 className="text-2xl font-bold text-foreground">Profile</h1>
         </div>

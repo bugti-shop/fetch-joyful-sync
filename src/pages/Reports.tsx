@@ -135,7 +135,7 @@ const Reports = () => {
   return (
     <div className={`min-h-screen ${bgColor} pb-24`}>
       {/* Header */}
-      <div className="sticky top-0 z-30 mb-4 bg-background/90 backdrop-blur-md border-b border-border shadow-lg">
+      <div className="sticky top-0 z-30 mb-4 bg-background border-b border-border shadow-lg">
         <div className="max-w-[1400px] mx-auto px-4 sm:px-6 py-2">
           <div className="flex items-center gap-3">
             <button
