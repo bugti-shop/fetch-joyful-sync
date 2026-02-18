@@ -15,6 +15,7 @@ import Settings from "./pages/Settings";
 import Folders from "./pages/Folders";
 import FolderDetail from "./pages/FolderDetail";
 import Tools from "./pages/Tools";
+import Profile from "./pages/Profile";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -30,6 +31,7 @@ const AppRoutes = () => {
         <Route path="/folders" element={<Folders />} />
         <Route path="/folder/:folderId" element={<FolderDetail />} />
         <Route path="/tools" element={<Tools />} />
+        <Route path="/profile" element={<Profile />} />
         {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
         <Route path="*" element={<NotFound />} />
       </Routes>

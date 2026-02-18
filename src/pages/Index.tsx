@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef } from 'react';
-import { Plus, Target, TrendingUp, Moon, Sun, Trash2, Upload } from 'lucide-react';
+import { Plus, Target, TrendingUp, Moon, Sun, Trash2, Upload, Crown } from 'lucide-react';
 import SavingsButton from '@/components/SavingsButton';
 import JarVisualization from '@/components/JarVisualization';
 import CircularJarVisualization from '@/components/CircularJarVisualization';
@@ -16,6 +16,7 @@ import { hapticFeedback } from '@/lib/haptics';
 import logoImg from '@/assets/logo.png';
 import { ExpenseToggleIcon, ExpenseMainView } from '@/components/expense';
 import { App as CapacitorApp } from '@capacitor/app';
+import { ProPaywall, ProBadge } from '@/components/ProPaywall';
 import { DndContext, closestCenter, DragEndEvent, PointerSensor, useSensor, useSensors } from '@dnd-kit/core';
 import { SortableContext, horizontalListSortingStrategy, arrayMove } from '@dnd-kit/sortable';
 import { SortableJarCard } from '@/components/SortableJarCard';
@@ -69,6 +70,9 @@ interface TransactionRecord {
 const Index = () => {
   const { toast } = useToast();
   const { isExpenseMode } = useExpense();
+  const { canUseFeature } = useSubscription();
+  const [showProPaywall, setShowProPaywall] = useState(false);
+  const [paywallFeature, setPaywallFeature] = useState('');
   const [jars, setJars] = useState<Jar[]>([]);
   const [categories, setCategories] = useState<Category[]>([]);
   const [showCreateModal, setShowCreateModal] = useState(false);
@@ -550,6 +554,7 @@ const Index = () => {
   };
 
   return (
+    <>
     <div className={`min-h-screen ${bgColor} transition-colors duration-300 overflow-y-auto`}>
       {showConfetti && (
         <div className="fixed inset-0 pointer-events-none z-50 flex items-center justify-center">
@@ -937,48 +942,82 @@ const Index = () => {
               </SavingsButton>
             </div>
 
-            {/* Investment Projections */}
-            <div className={`${darkMode ? 'bg-gray-700' : 'bg-gradient-to-br from-blue-50 to-purple-50'} rounded-2xl p-4 mb-6`}>
-              <h3 className={`text-lg font-bold ${textColor} mb-2 flex items-center gap-2`}>
-                📈 Investment Plan
+            {/* Investment Projections - Pro Feature */}
+            {canUseFeature('investment_plan') ? (
+              <div className={`${darkMode ? 'bg-gray-700' : 'bg-gradient-to-br from-blue-50 to-purple-50'} rounded-2xl p-4 mb-6`}>
+                <h3 className={`text-lg font-bold ${textColor} mb-2 flex items-center gap-2`}>
+                  📈 Investment Plan
+                  {selectedJar.targetDate && (
+                    <span className={`text-xs ${textSecondary} font-normal`}>
+                      (Target: {new Date(selectedJar.targetDate).toLocaleDateString()})
+                    </span>
+                  )}
+                </h3>
                 {selectedJar.targetDate && (
-                  <span className={`text-xs ${textSecondary} font-normal`}>
-                    (Target: {new Date(selectedJar.targetDate).toLocaleDateString()})
-                  </span>
+                  <p className={`text-xs ${textSecondary} mb-4`}>
+                    Based on your target date
+                  </p>
                 )}
-              </h3>
-              {selectedJar.targetDate && (
-                <p className={`text-xs ${textSecondary} mb-4`}>
-                  Based on your target date
+                <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                  <div className={`${darkMode ? 'bg-gray-800' : 'bg-white'} rounded-xl p-3 text-center`}>
+                    <p className={`text-xs ${textSecondary} mb-1`}>Daily</p>
+                    <p className={`text-xl font-bold ${textColor}`}>
+                      {selectedJar.currency || '€'}{formatCurrency(getInvestmentPlan(selectedJar).daily)}
+                    </p>
+                  </div>
+                  <div className={`${darkMode ? 'bg-gray-800' : 'bg-white'} rounded-xl p-3 text-center`}>
+                    <p className={`text-xs ${textSecondary} mb-1`}>Weekly</p>
+                    <p className={`text-xl font-bold ${textColor}`}>
+                      {selectedJar.currency || '€'}{formatCurrency(getInvestmentPlan(selectedJar).weekly)}
+                    </p>
+                  </div>
+                  <div className={`${darkMode ? 'bg-gray-800' : 'bg-white'} rounded-xl p-3 text-center`}>
+                    <p className={`text-xs ${textSecondary} mb-1`}>Monthly</p>
+                    <p className={`text-xl font-bold ${textColor}`}>
+                      {selectedJar.currency || '€'}{formatCurrency(getInvestmentPlan(selectedJar).monthly)}
+                    </p>
+                  </div>
+                </div>
+                <p className={`text-xs ${textSecondary} text-center mt-3`}>
+                  {selectedJar.targetDate 
+                    ? `Save these amounts to reach your ${selectedJar.currency || '€'}${formatCurrency(selectedJar.target)} goal by your target date`
+                    : `Projected amounts to reach your ${selectedJar.currency || '€'}${formatCurrency(selectedJar.target)} goal`
+                  }
                 </p>
-              )}
-              <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
-                <div className={`${darkMode ? 'bg-gray-800' : 'bg-white'} rounded-xl p-3 text-center`}>
-                  <p className={`text-xs ${textSecondary} mb-1`}>Daily</p>
-                  <p className={`text-xl font-bold ${textColor}`}>
-                    {selectedJar.currency || '€'}{formatCurrency(getInvestmentPlan(selectedJar).daily)}
-                  </p>
-                </div>
-                <div className={`${darkMode ? 'bg-gray-800' : 'bg-white'} rounded-xl p-3 text-center`}>
-                  <p className={`text-xs ${textSecondary} mb-1`}>Weekly</p>
-                  <p className={`text-xl font-bold ${textColor}`}>
-                    {selectedJar.currency || '€'}{formatCurrency(getInvestmentPlan(selectedJar).weekly)}
-                  </p>
-                </div>
-                <div className={`${darkMode ? 'bg-gray-800' : 'bg-white'} rounded-xl p-3 text-center`}>
-                  <p className={`text-xs ${textSecondary} mb-1`}>Monthly</p>
-                  <p className={`text-xl font-bold ${textColor}`}>
-                    {selectedJar.currency || '€'}{formatCurrency(getInvestmentPlan(selectedJar).monthly)}
-                  </p>
-                </div>
               </div>
-              <p className={`text-xs ${textSecondary} text-center mt-3`}>
-                {selectedJar.targetDate 
-                  ? `Save these amounts to reach your ${selectedJar.currency || '€'}${formatCurrency(selectedJar.target)} goal by your target date`
-                  : `Projected amounts to reach your ${selectedJar.currency || '€'}${formatCurrency(selectedJar.target)} goal`
-                }
-              </p>
-            </div>
+            ) : (
+              <button
+                onClick={() => {
+                  setPaywallFeature('Investment Plan');
+                  setShowProPaywall(true);
+                }}
+                className={`w-full ${darkMode ? 'bg-gray-700' : 'bg-gradient-to-br from-blue-50 to-purple-50'} rounded-2xl p-4 mb-6 text-left relative overflow-hidden`}
+              >
+                <div className="flex items-center justify-between">
+                  <h3 className={`text-lg font-bold ${textColor} flex items-center gap-2`}>
+                    📈 Investment Plan
+                  </h3>
+                  <ProBadge />
+                </div>
+                <p className={`text-sm ${textSecondary} mt-2`}>
+                  Unlock daily, weekly & monthly saving targets
+                </p>
+                <div className="mt-3 grid grid-cols-3 gap-3 opacity-40 blur-[2px]">
+                  <div className={`${darkMode ? 'bg-gray-800' : 'bg-white'} rounded-xl p-3 text-center`}>
+                    <p className={`text-xs ${textSecondary}`}>Daily</p>
+                    <p className={`text-xl font-bold ${textColor}`}>$--</p>
+                  </div>
+                  <div className={`${darkMode ? 'bg-gray-800' : 'bg-white'} rounded-xl p-3 text-center`}>
+                    <p className={`text-xs ${textSecondary}`}>Weekly</p>
+                    <p className={`text-xl font-bold ${textColor}`}>$--</p>
+                  </div>
+                  <div className={`${darkMode ? 'bg-gray-800' : 'bg-white'} rounded-xl p-3 text-center`}>
+                    <p className={`text-xs ${textSecondary}`}>Monthly</p>
+                    <p className={`text-xl font-bold ${textColor}`}>$--</p>
+                  </div>
+                </div>
+              </button>
+            )}
 
             {selectedJar.notes && selectedJar.notes.length > 0 && (
               <div className={`${darkMode ? 'bg-gray-700' : 'bg-gray-50'} rounded-2xl p-4 mb-6`}>
@@ -1063,13 +1102,25 @@ const Index = () => {
                     
                     <button
                       type="button"
-                      onClick={() => setNewJar({ ...newJar, purposeType: 'debt' })}
-                      className={`p-4 rounded-xl border-2 transition-all ${
+                      onClick={() => {
+                        if (!canUseFeature('debt_jar')) {
+                          setPaywallFeature('Debt/Loan Jar');
+                          setShowProPaywall(true);
+                          return;
+                        }
+                        setNewJar({ ...newJar, purposeType: 'debt' });
+                      }}
+                      className={`p-4 rounded-xl border-2 transition-all relative ${
                         newJar.purposeType === 'debt'
                           ? 'border-primary bg-primary/10'
                           : darkMode ? 'border-gray-600 hover:border-gray-500' : 'border-gray-300 hover:border-gray-400'
                       }`}
                     >
+                      {!canUseFeature('debt_jar') && (
+                        <div className="absolute top-2 right-2">
+                          <ProBadge />
+                        </div>
+                      )}
                       <div className="text-3xl mb-2">📉</div>
                       <p className={`text-sm font-medium text-center ${textColor}`}>Debt/Loan</p>
                       <p className={`text-xs ${textSecondary} text-center mt-1`}>Track payoff progress</p>
@@ -1099,13 +1150,25 @@ const Index = () => {
                     
                     <button
                       type="button"
-                      onClick={() => setNewJar({ ...newJar, jarType: 'circular' })}
-                      className={`p-4 rounded-xl border-2 transition-all ${
+                      onClick={() => {
+                        if (!canUseFeature('image_jar')) {
+                          setPaywallFeature('Image Jar (Photo Circle)');
+                          setShowProPaywall(true);
+                          return;
+                        }
+                        setNewJar({ ...newJar, jarType: 'circular' });
+                      }}
+                      className={`p-4 rounded-xl border-2 transition-all relative ${
                         newJar.jarType === 'circular'
                           ? 'border-primary bg-primary/10'
                           : darkMode ? 'border-gray-600 bg-gray-700 hover:border-gray-500' : 'border-gray-300 bg-white hover:border-gray-400'
                       }`}
                     >
+                      {!canUseFeature('image_jar') && (
+                        <div className="absolute top-2 right-2">
+                          <ProBadge />
+                        </div>
+                      )}
                       <div className="h-24 mb-2 flex items-center justify-center">
                         <CircularJarVisualization progress={50} jarId={9998} isLarge={false} />
                       </div>
@@ -1190,14 +1253,30 @@ const Index = () => {
                   </select>
                 </div>
                 <div className="mb-4">
-                  <label className={`block text-sm font-medium mb-2 ${textColor}`}>Currency Symbol</label>
+                  <label className={`block text-sm font-medium mb-2 ${textColor}`}>
+                    Currency Symbol
+                    {!canUseFeature('currency_symbols') && (
+                      <ProBadge onClick={() => {
+                        setPaywallFeature('Custom Currency Symbols');
+                        setShowProPaywall(true);
+                      }} className="ml-2" />
+                    )}
+                  </label>
                   <select
                     value={newJar.currency === customCurrency && customCurrency ? 'custom' : newJar.currency}
                     onChange={(e) => {
-                      if (e.target.value === 'custom') {
+                      const val = e.target.value;
+                      // Only $ is free
+                      if (val !== '$' && !canUseFeature('currency_symbols')) {
+                        setPaywallFeature('Custom Currency Symbols');
+                        setShowProPaywall(true);
+                        e.target.value = '$';
+                        return;
+                      }
+                      if (val === 'custom') {
                         setNewJar({ ...newJar, currency: customCurrency || '$' });
                       } else {
-                        setNewJar({ ...newJar, currency: e.target.value });
+                        setNewJar({ ...newJar, currency: val });
                         setCustomCurrency('');
                       }
                     }}
@@ -1206,19 +1285,19 @@ const Index = () => {
                     }`}
                     >
                       <option value="$">$ (USD - Dollar)</option>
-                      <option value="€">€ (EUR - Euro)</option>
-                      <option value="£">£ (GBP - Pound)</option>
-                      <option value="¥">¥ (JPY/CNY - Yen/Yuan)</option>
-                      <option value="₹">₹ (INR - Rupee)</option>
-                      <option value="₽">₽ (RUB - Ruble)</option>
-                      <option value="₩">₩ (KRW - Won)</option>
-                      <option value="PKR">PKR (Pakistani Rupee)</option>
-                      <option value="AED">AED (UAE Dirham)</option>
-                      <option value="SAR">SAR (Saudi Riyal)</option>
-                      <option value="CHF">CHF (Swiss Franc)</option>
-                      <option value="CAD">CAD (Canadian Dollar)</option>
-                      <option value="AUD">AUD (Australian Dollar)</option>
-                      <option value="custom">Custom Currency</option>
+                      <option value="€">€ (EUR - Euro) 👑</option>
+                      <option value="£">£ (GBP - Pound) 👑</option>
+                      <option value="¥">¥ (JPY/CNY - Yen/Yuan) 👑</option>
+                      <option value="₹">₹ (INR - Rupee) 👑</option>
+                      <option value="₽">₽ (RUB - Ruble) 👑</option>
+                      <option value="₩">₩ (KRW - Won) 👑</option>
+                      <option value="PKR">PKR (Pakistani Rupee) 👑</option>
+                      <option value="AED">AED (UAE Dirham) 👑</option>
+                      <option value="SAR">SAR (Saudi Riyal) 👑</option>
+                      <option value="CHF">CHF (Swiss Franc) 👑</option>
+                      <option value="CAD">CAD (Canadian Dollar) 👑</option>
+                      <option value="AUD">AUD (Australian Dollar) 👑</option>
+                      <option value="custom">Custom Currency 👑</option>
                     </select>
                     {(newJar.currency === customCurrency || newJar.currency === 'custom') && (
                       <input
@@ -1618,6 +1697,13 @@ const Index = () => {
         </div>
       )}
     </div>
+
+      <ProPaywall
+        isOpen={showProPaywall}
+        onClose={() => setShowProPaywall(false)}
+        featureName={paywallFeature}
+      />
+    </>
   );
 };
 
