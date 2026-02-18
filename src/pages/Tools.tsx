@@ -330,7 +330,7 @@ const Tools = () => {
   if (!canUseFeature('advancedCalculator')) {
     return (
       <div className="min-h-screen bg-background pb-20">
-        <div className="sticky top-0 z-40 bg-background/95 backdrop-blur-md border-b border-border">
+        <div className="sticky top-0 z-40 bg-background border-b border-border">
           <div className="max-w-screen-xl mx-auto px-4 py-4 flex items-center justify-between">
             <h1 className="text-2xl font-bold text-foreground">Financial Calculators</h1>
             <button onClick={() => navigate('/settings')} className="p-2 hover:bg-accent rounded-lg transition-colors">
@@ -356,7 +356,7 @@ const Tools = () => {
   return (
     <div className="min-h-screen bg-background pb-20">
       {/* Header */}
-      <div className="sticky top-0 z-40 bg-background/95 backdrop-blur-md border-b border-border">
+      <div className="sticky top-0 z-40 bg-background border-b border-border">
         <div className="max-w-screen-xl mx-auto px-4 py-4 flex items-center justify-between">
           <h1 className="text-2xl font-bold text-foreground">Financial Calculators</h1>
           <button

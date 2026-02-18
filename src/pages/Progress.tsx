@@ -173,7 +173,7 @@ const Progress = () => {
   return (
     <div className="min-h-screen bg-background pb-24">
       {/* Header */}
-      <div className="sticky top-0 z-30 mb-4 bg-background/90 backdrop-blur-md border-b border-border shadow-lg">
+      <div className="sticky top-0 z-30 mb-4 bg-background border-b border-border shadow-lg">
         <div className="max-w-[1400px] mx-auto px-4 sm:px-6 py-3">
           <h1 className="text-xl sm:text-2xl font-bold text-foreground">Progress</h1>
         </div>

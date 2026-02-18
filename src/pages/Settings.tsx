@@ -225,7 +225,7 @@ const Settings = () => {
   return (
     <div className="min-h-screen bg-background pb-24">
       {/* Header */}
-      <div className="sticky top-0 z-30 mb-2 bg-background/90 backdrop-blur-md border-b border-border shadow-sm">
+      <div className="sticky top-0 z-30 mb-2 bg-background border-b border-border shadow-sm">
         <div className="max-w-[1400px] mx-auto px-4 sm:px-6 py-4">
           <div className="flex items-center gap-4">
             <button
