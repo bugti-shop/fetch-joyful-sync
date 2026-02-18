@@ -55,12 +55,12 @@ export const ProPaywall = ({ isOpen, onClose, featureName }: ProPaywallProps) =>
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center">
+    <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center overflow-y-auto">
       {/* Backdrop */}
-      <div className="absolute inset-0 bg-black/50 backdrop-blur-sm" onClick={onClose} />
+      <div className="fixed inset-0 bg-black/50 backdrop-blur-sm" onClick={onClose} />
 
       {/* Modal */}
-      <div className="relative w-full max-w-md bg-[#1a1a2e] rounded-t-3xl sm:rounded-3xl max-h-[92vh] overflow-y-auto">
+      <div className="relative w-full max-w-md bg-[#1a1a2e] rounded-t-3xl sm:rounded-3xl max-h-[90vh] overflow-y-auto overscroll-contain touch-pan-y">
         {/* Close Button */}
         <button
           onClick={onClose}
