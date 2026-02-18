@@ -660,7 +660,20 @@ const Index = () => {
                   <h2 className={`text-lg sm:text-xl md:text-2xl font-bold ${textColor}`}>Notes</h2>
                 </div>
                 <div className="flex gap-2 sm:gap-3 -ml-[2.4%]">
-                  <SavingsButton onClick={() => setShowCalculator(true)} variant="secondary" size="default" className="text-sm sm:text-base w-auto whitespace-nowrap">
+                  <SavingsButton 
+                    onClick={() => {
+                      if (!canUseFeature('advancedCalculator')) {
+                        setPaywallFeature('Savings Calculator');
+                        setShowProPaywall(true);
+                        return;
+                      }
+                      setShowCalculator(true);
+                    }} 
+                    variant="secondary" 
+                    size="default" 
+                    className="text-sm sm:text-base w-auto whitespace-nowrap gap-1.5"
+                  >
+                    {!canUseFeature('advancedCalculator') && <Crown className="h-3.5 w-3.5 text-amber-500" />}
                     📊 Calculator
                   </SavingsButton>
                   <SavingsButton onClick={() => setShowNoteModal(true)} size="default" className="text-sm sm:text-base w-auto whitespace-nowrap">
