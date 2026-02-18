@@ -1,15 +1,19 @@
-import { User, LogIn, LogOut, Crown } from 'lucide-react';
+import { User, LogIn, LogOut, Crown, RefreshCw, Cloud, CloudOff } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
+import { Switch } from '@/components/ui/switch';
 import { useSubscription } from '@/contexts/SubscriptionContext';
 import { useGoogleAuth } from '@/contexts/GoogleAuthContext';
+import { useSync } from '@/contexts/SyncContext';
 import { ProPaywall } from '@/components/ProPaywall';
 import { useState } from 'react';
+import { formatDistanceToNow } from 'date-fns';
 
 export const ExpenseProfileView = () => {
   const { tier } = useSubscription();
   const { user, isSignedIn, isLoading, signIn, signOut } = useGoogleAuth();
+  const { isSyncing, lastSynced, syncNow, autoSyncEnabled, setAutoSyncEnabled } = useSync();
   const isPremium = tier === 'premium';
   const [showPaywall, setShowPaywall] = useState(false);
 
@@ -86,6 +90,56 @@ export const ExpenseProfileView = () => {
           )}
         </div>
       </Card>
+
+      {/* Sync Card - Only show when signed in */}
+      {isSignedIn && (
+        <Card className="p-6">
+          <div className="flex items-center justify-between mb-4">
+            <div className="flex items-center gap-2">
+              <Cloud className="h-6 w-6 text-primary" />
+              <h3 className="font-semibold text-foreground">Google Drive Sync</h3>
+            </div>
+            <Badge variant="outline" className="text-xs">
+              {isSyncing ? 'Syncing...' : lastSynced ? 'Active' : 'Ready'}
+            </Badge>
+          </div>
+
+          <p className="text-sm text-muted-foreground mb-3">
+            Your expenses, incomes, categories, and all data are synced to your Google Drive.
+          </p>
+
+          {lastSynced && (
+            <p className="text-xs text-muted-foreground mb-3">
+              Last synced: {formatDistanceToNow(new Date(lastSynced), { addSuffix: true })}
+            </p>
+          )}
+
+          <div className="flex items-center justify-between mb-4">
+            <div className="flex items-center gap-2">
+              {autoSyncEnabled ? (
+                <Cloud className="h-4 w-4 text-primary" />
+              ) : (
+                <CloudOff className="h-4 w-4 text-muted-foreground" />
+              )}
+              <span className="text-sm text-foreground">Auto Sync</span>
+            </div>
+            <Switch
+              checked={autoSyncEnabled}
+              onCheckedChange={setAutoSyncEnabled}
+            />
+          </div>
+
+          <Button
+            onClick={syncNow}
+            disabled={isSyncing}
+            className="w-full"
+            variant="outline"
+          >
+            <RefreshCw className={`h-4 w-4 mr-2 ${isSyncing ? 'animate-spin' : ''}`} />
+            {isSyncing ? 'Syncing...' : 'Sync Now'}
+          </Button>
+        </Card>
+      )}
 
       {/* Subscription Status */}
       <Card className="p-6">
