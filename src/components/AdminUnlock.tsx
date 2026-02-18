@@ -7,7 +7,7 @@ import { useToast } from '@/hooks/use-toast';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 
 // The admin secret code - change this to your own secret
-const ADMIN_SECRET = 'jarify2024admin';
+const ADMIN_SECRET = 'BUGTI';
 const ADMIN_STORAGE_KEY = 'jarify_admin_unlocked';
 
 export const isAdminUnlocked = (): boolean => {
