@@ -46,7 +46,7 @@ export const BackupSync = ({ onExport, onImport, renderAsListItems = false }: Ba
 
         toast({
           title: "Backup Complete",
-          description: `Your data has been backed up in: ${fullPath}`,
+          description: "Your data has been backed up in \" Documents Folder",
           duration: 8000,
         });
       } else {
@@ -66,7 +66,7 @@ export const BackupSync = ({ onExport, onImport, renderAsListItems = false }: Ba
 
         toast({
           title: "Backup Complete",
-          description: `Your data has been backed up in: ${downloadPath}`,
+          description: "Your data has been backed up in \" Documents Folder",
           duration: 8000,
         });
       }
