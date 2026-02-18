@@ -17,9 +17,9 @@ const triggerHaptic = async () => {
 const navItems = [
   { to: '/', label: 'Home', icon: Home },
   { to: '/progress', label: 'Progress', icon: BarChart3 },
+  { to: '/profile', label: 'Profile', icon: User },
   { to: '/tools', label: 'Tools', icon: Wrench },
   { to: '/settings', label: 'Settings', icon: Settings },
-  { to: '/profile', label: 'Profile', icon: User },
 ];
 
 export const BottomNav = () => {
