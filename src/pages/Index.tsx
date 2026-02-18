@@ -621,7 +621,6 @@ const Index = () => {
                   }}
                   className="flex items-center gap-1 px-3 py-1.5 rounded-full bg-card border border-border text-sm font-medium text-foreground hover:bg-accent transition-colors"
                 >
-                  <Crown size={14} className="text-amber-500" />
                   Backup & Restore
                 </button>
               )}
