@@ -7,6 +7,7 @@ import { SubscriptionProvider } from "@/contexts/SubscriptionContext";
 import { WelcomeProvider } from "@/contexts/WelcomeContext";
 import { ExpenseProvider } from "@/contexts/ExpenseContext";
 import { FamilyProvider } from "@/contexts/FamilyContext";
+import { GoogleAuthProvider } from "@/contexts/GoogleAuthContext";
 import { BottomNav } from "@/components/BottomNav";
 import Index from "./pages/Index";
 import Progress from "./pages/Progress";
@@ -43,19 +44,21 @@ const AppRoutes = () => {
 const App = () => (
   <QueryClientProvider client={queryClient}>
     <SubscriptionProvider>
-      <WelcomeProvider>
-        <ExpenseProvider>
-          <FamilyProvider>
-            <TooltipProvider>
-              <Toaster />
-              <Sonner />
-              <BrowserRouter>
-                <AppRoutes />
-              </BrowserRouter>
-            </TooltipProvider>
-          </FamilyProvider>
-        </ExpenseProvider>
-      </WelcomeProvider>
+      <GoogleAuthProvider>
+        <WelcomeProvider>
+          <ExpenseProvider>
+            <FamilyProvider>
+              <TooltipProvider>
+                <Toaster />
+                <Sonner />
+                <BrowserRouter>
+                  <AppRoutes />
+                </BrowserRouter>
+              </TooltipProvider>
+            </FamilyProvider>
+          </ExpenseProvider>
+        </WelcomeProvider>
+      </GoogleAuthProvider>
     </SubscriptionProvider>
   </QueryClientProvider>
 );

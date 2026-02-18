@@ -123,3 +123,110 @@ npx cap run android
 ### Authentication Errors
 1. Add tester email to License testing in Play Console
 2. Ensure test account has a valid payment method added
+
+---
+
+## Google Sign-In Setup (Capgo Social Login)
+
+### Step 1: Add `strings.xml`
+
+Create or update `android/app/src/main/res/values/strings.xml`:
+
+```xml
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">Jarify</string>
+    <string name="title_activity_main">Jarify</string>
+    <string name="package_name">com.jarify.app</string>
+    <string name="custom_url_scheme">com.jarify.app</string>
+
+    <!-- Google Sign-In Web Client ID -->
+    <string name="server_client_id">467764265978-hupkmmhkn56t71cs1u5mm2p173922408.apps.googleusercontent.com</string>
+    
+    <!-- Google Sign-In Scopes -->
+    <string name="google_scope_email">email</string>
+    <string name="google_scope_profile">profile</string>
+    <string name="google_scope_openid">openid</string>
+    <string name="google_scope_drive_file">https://www.googleapis.com/auth/drive.file</string>
+    <string name="google_scope_drive_appdata">https://www.googleapis.com/auth/drive.appdata</string>
+</resources>
+```
+
+### Step 2: Full `MainActivity.java`
+
+Replace `android/app/src/main/java/com/jarify/app/MainActivity.java` with:
+
+```java
+package com.jarify.app;
+
+import android.os.Bundle;
+import com.getcapacitor.BridgeActivity;
+import ee.forgr.capacitor.social.login.SocialLoginPlugin;
+
+public class MainActivity extends BridgeActivity {
+    @Override
+    public void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+
+        // Register Capgo Social Login Plugin
+        registerPlugin(SocialLoginPlugin.class);
+    }
+}
+```
+
+### Step 3: Update `AndroidManifest.xml`
+
+Ensure the following permissions and intent filters are in `android/app/src/main/AndroidManifest.xml`:
+
+```xml
+<uses-permission android:name="android.permission.INTERNET" />
+<uses-permission android:name="com.android.vending.BILLING" />
+
+<application ...>
+    <activity
+        android:name=".MainActivity"
+        android:exported="true"
+        android:launchMode="singleTask">
+        
+        <intent-filter>
+            <action android:name="android.intent.action.MAIN" />
+            <category android:name="android.intent.category.LAUNCHER" />
+        </intent-filter>
+
+        <!-- Deep link for Google Sign-In callback -->
+        <intent-filter>
+            <action android:name="android.intent.action.VIEW" />
+            <category android:name="android.intent.category.DEFAULT" />
+            <category android:name="android.intent.category.BROWSABLE" />
+            <data android:scheme="com.jarify.app" />
+        </intent-filter>
+    </activity>
+</application>
+```
+
+### Step 4: Sync and Build
+
+```bash
+npm install
+npx cap sync android
+cd android
+./gradlew clean
+cd ..
+npx cap run android
+```
+
+### Google Sign-In Scopes
+
+| Scope | Description |
+|-------|-------------|
+| `email` | User's email address |
+| `profile` | User's basic profile info |
+| `openid` | OpenID Connect authentication |
+| `auth/drive.file` | Access files created by the app |
+| `auth/drive.appdata` | Access app-specific data in Drive |
+
+### Google OAuth Web Client ID
+
+```
+467764265978-hupkmmhkn56t71cs1u5mm2p173922408.apps.googleusercontent.com
+```
