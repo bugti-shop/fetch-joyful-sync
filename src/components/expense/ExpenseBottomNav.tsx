@@ -1,6 +1,17 @@
 import { Home, BarChart3, Wallet, Settings, User } from 'lucide-react';
 import { hapticFeedback } from '@/lib/haptics';
 
+const triggerHaptic = async () => {
+  try {
+    await hapticFeedback.heavy();
+    setTimeout(async () => {
+      await hapticFeedback.heavy();
+    }, 50);
+  } catch (error) {
+    // Haptics not available
+  }
+};
+
 export type ExpenseTab = 'home' | 'stats' | 'accounts' | 'profile' | 'settings';
 
 interface ExpenseBottomNavProps {
@@ -28,7 +39,7 @@ export const ExpenseBottomNav = ({ activeTab, onTabChange }: ExpenseBottomNavPro
             <button
               key={tab.id}
               onClick={() => {
-                hapticFeedback.light();
+                triggerHaptic();
                 onTabChange(tab.id);
               }}
               className={`flex flex-col items-center gap-0.5 py-1.5 px-5 rounded-xl transition-colors ${
