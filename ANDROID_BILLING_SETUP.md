@@ -194,7 +194,19 @@ Create or update `android/app/src/main/res/values/strings.xml`:
 </resources>
 ```
 
+
+### Step 2.5: Splash Screen Background
+
+Update `android/app/src/main/res/values/styles.xml` to set the primary brand color as the window background (prevents white flash):
+
+```xml
+<style name="AppTheme.NoActionBarLaunch" parent="AppTheme.NoActionBar">
+    <item name="android:windowBackground">#3a6cc9</item>
+</style>
+```
+
 ### Step 3: Update `AndroidManifest.xml`
+
 
 Ensure the following permissions and intent filters are in `android/app/src/main/AndroidManifest.xml`:
 
