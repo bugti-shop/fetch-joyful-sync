@@ -165,6 +165,7 @@ export const ProPaywall = ({ isOpen, onClose, featureName }: ProPaywallProps) =>
               )}
               <p className="text-white font-bold text-sm mt-1">Yearly</p>
               <p className="text-white/60 text-[10px]">{pricing.yearly.displayPrice}</p>
+              <p className="text-white/40 text-[8px] mt-0.5">{pricing.yearly.displayYearlyPrice}</p>
             </button>
           </div>
 
