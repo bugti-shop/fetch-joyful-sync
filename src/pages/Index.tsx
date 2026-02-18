@@ -592,20 +592,33 @@ const Index = () => {
             </div>
             <div className="flex items-center gap-2">
               <ExpenseToggleIcon />
-              <BackupSync 
-                onExport={() => {
-                  toast({
-                    title: 'Backup Complete',
-                    description: 'Your data has been backed up successfully.',
-                  });
-                }} 
-                onImport={() => {
-                  toast({
-                    title: 'Data Restored',
-                    description: 'Your backup has been restored.',
-                  });
-                }} 
-              />
+              {canUseFeature('backupSync') ? (
+                <BackupSync 
+                  onExport={() => {
+                    toast({
+                      title: 'Backup Complete',
+                      description: 'Your data has been backed up successfully.',
+                    });
+                  }} 
+                  onImport={() => {
+                    toast({
+                      title: 'Data Restored',
+                      description: 'Your backup has been restored.',
+                    });
+                  }} 
+                />
+              ) : (
+                <button
+                  onClick={() => {
+                    setPaywallFeature('Backup & Restore');
+                    setShowProPaywall(true);
+                  }}
+                  className="flex items-center gap-1 px-3 py-1.5 rounded-full bg-card border border-border text-sm font-medium text-foreground hover:bg-accent transition-colors"
+                >
+                  <Crown size={14} className="text-amber-500" />
+                  Backup & Restore
+                </button>
+              )}
               <button
                 onClick={cycleTheme}
                 className={`p-2 sm:p-3 rounded-full ${darkMode ? 'bg-gray-800/80' : 'bg-white/80'} backdrop-blur-sm shadow-lg hover:shadow-xl transition-all border ${darkMode ? 'border-gray-700' : 'border-gray-200'}`}

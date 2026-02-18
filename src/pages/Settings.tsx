@@ -1,10 +1,12 @@
 import { useState, useEffect } from 'react';
-import { ArrowLeft, ChevronRight, Settings as SettingsIcon, Bell, Shield } from 'lucide-react';
+import { ArrowLeft, ChevronRight, Settings as SettingsIcon, Bell, Shield, Crown } from 'lucide-react';
 import { AdminUnlock } from '@/components/AdminUnlock';
 import { useNavigate } from 'react-router-dom';
 import { BackupSync } from '@/components/BackupSync';
 import { useToast } from '@/hooks/use-toast';
 import { hapticFeedback } from '@/lib/haptics';
+import { useSubscription } from '@/contexts/SubscriptionContext';
+import { ProPaywall } from '@/components/ProPaywall';
 import { storage } from '@/lib/storage';
 import { Switch } from '@/components/ui/switch';
 import { LocalNotifications } from '@capacitor/local-notifications';
@@ -50,6 +52,9 @@ interface NotificationPreferences {
 const Settings = () => {
   const navigate = useNavigate();
   const { toast } = useToast();
+  const { canUseFeature } = useSubscription();
+  const [showProPaywall, setShowProPaywall] = useState(false);
+  const [paywallFeature, setPaywallFeature] = useState('');
   const [notificationPrefs, setNotificationPrefs] = useState<NotificationPreferences>({
     enabled: false,
     frequency: 'daily',
@@ -326,22 +331,47 @@ const Settings = () => {
 
         {/* Data Management Section */}
         <div className="bg-card rounded-lg mb-4 mx-4 overflow-hidden shadow-sm">
-          <BackupSync 
-            onExport={() => {
-              toast({
-                title: 'Backup Complete',
-                description: 'Your data has been backed up successfully.',
-              });
-            }} 
-            onImport={() => {
-              toast({
-                title: 'Data Restored',
-                description: 'Your backup has been restored.',
-              });
-              setTimeout(() => window.location.reload(), 1000);
-            }}
-            renderAsListItems={true}
-          />
+          {canUseFeature('backupSync') ? (
+            <BackupSync 
+              onExport={() => {
+                toast({
+                  title: 'Backup Complete',
+                  description: 'Your data has been backed up successfully.',
+                });
+              }} 
+              onImport={() => {
+                toast({
+                  title: 'Data Restored',
+                  description: 'Your backup has been restored.',
+                });
+                setTimeout(() => window.location.reload(), 1000);
+              }}
+              renderAsListItems={true}
+            />
+          ) : (
+            <>
+              <button
+                onClick={() => {
+                  setPaywallFeature('Backup & Restore');
+                  setShowProPaywall(true);
+                }}
+                className="w-full flex items-center justify-between py-4 px-4 text-foreground hover:bg-accent/50 transition-colors border-b border-border/50"
+              >
+                <span className="text-base flex items-center gap-2">Back up data <Crown size={14} className="text-amber-500" /></span>
+                <ChevronRight className="w-5 h-5 text-muted-foreground" />
+              </button>
+              <button
+                onClick={() => {
+                  setPaywallFeature('Backup & Restore');
+                  setShowProPaywall(true);
+                }}
+                className="w-full flex items-center justify-between py-4 px-4 text-foreground hover:bg-accent/50 transition-colors border-b border-border/50"
+              >
+                <span className="text-base flex items-center gap-2">Restore data <Crown size={14} className="text-amber-500" /></span>
+                <ChevronRight className="w-5 h-5 text-muted-foreground" />
+              </button>
+            </>
+          )}
           <SettingsItem label="Download my data" onClick={handleDownloadData} />
           <AlertDialog>
             <AlertDialogTrigger asChild>
@@ -474,6 +504,7 @@ const Settings = () => {
         </div>
 
       </div>
+      <ProPaywall isOpen={showProPaywall} onClose={() => setShowProPaywall(false)} featureName={paywallFeature} />
     </div>
   );
 };
