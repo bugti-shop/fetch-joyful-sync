@@ -671,9 +671,8 @@ const Index = () => {
                     }} 
                     variant="secondary" 
                     size="default" 
-                    className="text-sm sm:text-base w-auto whitespace-nowrap gap-1.5"
+                    className="text-sm sm:text-base w-auto whitespace-nowrap"
                   >
-                    {!canUseFeature('advancedCalculator') && <Crown className="h-3.5 w-3.5 text-amber-500" />}
                     📊 Calculator
                   </SavingsButton>
                   <SavingsButton onClick={() => setShowNoteModal(true)} size="default" className="text-sm sm:text-base w-auto whitespace-nowrap">
