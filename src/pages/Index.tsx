@@ -15,6 +15,7 @@ import { formatCurrency } from '@/lib/utils';
 import { hapticFeedback } from '@/lib/haptics';
 import logoImg from '@/assets/logo.png';
 import { ExpenseToggleIcon, ExpenseMainView } from '@/components/expense';
+import { SyncStatusIndicator } from '@/components/SyncStatusIndicator';
 import { App as CapacitorApp } from '@capacitor/app';
 import { ProPaywall, ProBadge } from '@/components/ProPaywall';
 import { DndContext, closestCenter, DragEndEvent, PointerSensor, useSensor, useSensors } from '@dnd-kit/core';
@@ -596,7 +597,8 @@ const Index = () => {
                 Jarify
               </h1>
             </div>
-            <div className="flex items-center gap-2">
+            <div className="flex items-center gap-1.5">
+              <SyncStatusIndicator />
               <ExpenseToggleIcon />
               {canUseFeature('backupSync') ? (
                 <BackupSync 
