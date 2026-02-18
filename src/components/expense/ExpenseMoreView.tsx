@@ -9,8 +9,11 @@ import {
   Users,
   Split,
   Star,
-  MapPin
+  MapPin,
+  Crown
 } from 'lucide-react';
+import { useSubscription } from '@/contexts/SubscriptionContext';
+import { ProPaywall } from '@/components/ProPaywall';
 import { CustomCategoryManager } from './CustomCategoryManager';
 import { RecurringExpenses } from './RecurringExpenses';
 import { ExpenseExport } from './ExpenseExport';
@@ -24,6 +27,19 @@ type SettingSection = 'categories' | 'recurring' | 'export' | 'notifications' | 
 
 export const ExpenseMoreView = () => {
   const [activeSection, setActiveSection] = useState<SettingSection>(null);
+  const [showPaywall, setShowPaywall] = useState(false);
+  const { canUseFeature } = useSubscription();
+  const isPremium = canUseFeature('spending_insights');
+
+  const premiumSections: SettingSection[] = ['recurring', 'export', 'notifications', 'family', 'split', 'location'];
+
+  const handleSectionClick = (id: SettingSection) => {
+    if (!isPremium && premiumSections.includes(id)) {
+      setShowPaywall(true);
+    } else {
+      setActiveSection(id);
+    }
+  };
 
   const menuItems = [
     {
@@ -98,7 +114,7 @@ export const ExpenseMoreView = () => {
             <motion.button
               key={item.id}
               whileTap={{ scale: 0.98 }}
-              onClick={() => setActiveSection(item.id)}
+              onClick={() => handleSectionClick(item.id)}
               className={`w-full flex items-center justify-between p-4 hover:bg-secondary/30 transition-colors ${
                 index !== menuItems.length - 1 ? 'border-b border-border' : ''
               }`}
@@ -106,7 +122,12 @@ export const ExpenseMoreView = () => {
               <div className="flex items-center gap-3">
                 <Icon size={20} className="text-muted-foreground" />
                 <div className="text-left">
-                  <p className="font-medium text-foreground">{item.label}</p>
+                  <p className="font-medium text-foreground">
+                    {item.label}
+                    {!isPremium && premiumSections.includes(item.id) && (
+                      <Crown className="inline-block ml-1.5 h-3.5 w-3.5 text-amber-500" />
+                    )}
+                  </p>
                   <p className="text-xs text-muted-foreground">{item.description}</p>
                 </div>
               </div>
@@ -168,6 +189,8 @@ export const ExpenseMoreView = () => {
       {activeSection === 'location' && (
         <LocationReminderSettings onClose={() => setActiveSection(null)} />
       )}
+
+      <ProPaywall isOpen={showPaywall} onClose={() => setShowPaywall(false)} />
     </div>
   );
 };
