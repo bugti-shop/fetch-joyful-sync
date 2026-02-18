@@ -465,6 +465,16 @@ All colors MUST be HSL.
     @apply bg-background text-foreground;
     overflow-x: hidden;
     overflow-y: auto;
+    padding-top: env(safe-area-inset-top, 0px);
+  }
+
+  /* Safe area utilities */
+  .safe-area-top {
+    padding-top: env(safe-area-inset-top, 0px);
+  }
+
+  .safe-area-bottom {
+    padding-bottom: env(safe-area-inset-bottom, 0px);
   }
 
   /* Smooth scrolling optimizations */
@@ -474,8 +484,6 @@ All colors MUST be HSL.
   }
   
   /* GPU acceleration for transforms */
-  .backdrop-blur-\[1px\],
-  [class*="backdrop-blur"],
   .sticky,
   .fixed {
     will-change: transform;

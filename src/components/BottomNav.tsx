@@ -30,7 +30,7 @@ export const BottomNav = () => {
   }
 
   return (
-    <nav className="fixed bottom-0 left-0 right-0 z-50 bg-background/95 backdrop-blur-md border-t border-border">
+    <nav className="fixed bottom-0 left-0 right-0 z-50 bg-background border-t border-border safe-area-bottom">
       <div className="max-w-screen-xl mx-auto px-2">
         <div className="grid grid-cols-5 gap-1 py-1">
           {navItems.map(({ to, label, icon: Icon }) => (
