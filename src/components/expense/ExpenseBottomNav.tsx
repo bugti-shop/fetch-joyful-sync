@@ -23,8 +23,8 @@ export const ExpenseBottomNav = ({ activeTab, onTabChange }: ExpenseBottomNavPro
   const tabs = [
     { id: 'home' as ExpenseTab, label: 'Home', icon: Home },
     { id: 'stats' as ExpenseTab, label: 'Stats', icon: BarChart3 },
-    { id: 'accounts' as ExpenseTab, label: 'Accounts', icon: Wallet },
     { id: 'profile' as ExpenseTab, label: 'Profile', icon: User },
+    { id: 'accounts' as ExpenseTab, label: 'Account', icon: Wallet },
     { id: 'settings' as ExpenseTab, label: 'Settings', icon: Settings },
   ];
 
