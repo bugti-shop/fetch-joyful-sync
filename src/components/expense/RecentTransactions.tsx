@@ -2,6 +2,7 @@ import { useExpense } from '@/contexts/ExpenseContext';
 import { Trash2 } from 'lucide-react';
 import { format } from 'date-fns';
 import { formatCurrency } from '@/lib/utils';
+import { hapticFeedback } from '@/lib/haptics';
 
 interface RecentTransactionsProps {
   limit?: number;
@@ -58,7 +59,10 @@ export const RecentTransactions = ({ limit = 5, categoryId, showDelete = false }
               <span className="font-bold text-foreground">-${formatCurrency(expense.amount)}</span>
               {showDelete && (
                 <button
-                  onClick={() => deleteExpense(expense.id)}
+                  onClick={() => {
+                    hapticFeedback.medium();
+                    deleteExpense(expense.id);
+                  }}
                   className="p-1.5 rounded-lg hover:bg-destructive/10 text-muted-foreground hover:text-destructive"
                 >
                   <Trash2 size={16} />

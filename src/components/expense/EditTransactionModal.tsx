@@ -6,6 +6,7 @@ import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { Label } from '@/components/ui/label';
 import { useToast } from '@/hooks/use-toast';
+import { hapticFeedback } from '@/lib/haptics';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { currencies, loadCurrencySettings, convertCurrency, formatCurrencyAmount } from '@/lib/currency';
 
@@ -143,12 +144,15 @@ export const EditTransactionModal = ({ transaction, isOpen, onClose, onSave }: E
 
     if (transaction.type === 'expense') {
       updateExpense(transaction.id, updates);
+      hapticFeedback.success();
+      hapticFeedback.success();
       toast({ 
         title: 'Expense updated', 
         description: `${formatCurrencyAmount(originalAmount, selectedCurrency)} expense saved` 
       });
     } else if (transaction.type === 'income') {
       updateIncome(transaction.id, updates);
+      hapticFeedback.success();
       toast({ 
         title: 'Income updated', 
         description: `${formatCurrencyAmount(originalAmount, selectedCurrency)} income saved` 
@@ -241,7 +245,10 @@ export const EditTransactionModal = ({ transaction, isOpen, onClose, onSave }: E
                 <button
                   key={cat.id}
                   type="button"
-                  onClick={() => setCategoryId(cat.id)}
+                  onClick={() => {
+                    hapticFeedback.light();
+                    setCategoryId(cat.id);
+                  }}
                   className={`p-2 rounded-xl flex flex-col items-center gap-1 ${
                     categoryId === cat.id 
                       ? 'bg-primary text-primary-foreground scale-105 shadow-lg ring-2 ring-primary/50' 

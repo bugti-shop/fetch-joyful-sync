@@ -4,6 +4,7 @@ import { useState, useMemo } from 'react';
 import { useExpense } from '@/contexts/ExpenseContext';
 import { formatCurrencyAmount, loadCurrencySettings } from '@/lib/currency';
 import { useToast } from '@/hooks/use-toast';
+import { hapticFeedback } from '@/lib/haptics';
 import { EditTransactionModal } from './EditTransactionModal';
 import { ReceiptViewer } from './ReceiptViewer';
 import {
@@ -92,6 +93,7 @@ export const TransactionDetailModal = ({
   const isStarred = starredIds.includes(txData.id);
   
   const handleToggleStar = () => {
+    hapticFeedback.light();
     toggleStarred(txData.id, txData.type as 'expense' | 'income');
     toast({ 
       title: isStarred ? 'Removed from starred' : 'Added to starred',
@@ -118,16 +120,19 @@ export const TransactionDetailModal = ({
   };
 
   const handleCopy = () => {
+    hapticFeedback.light();
     const details = `${categoryName}: ${txData.type === 'expense' ? '-' : '+'}${formatCurrencyAmount(primaryAmount, primaryCurrency)}`;
     navigator.clipboard.writeText(details);
     toast({ title: 'Copied', description: 'Transaction details copied to clipboard' });
   };
 
   const handleDeleteClick = () => {
+    hapticFeedback.medium();
     setShowDeleteConfirm(true);
   };
 
   const handleConfirmDelete = () => {
+    hapticFeedback.medium();
     if (onDelete) {
       onDelete(txData as Transaction);
     }
@@ -136,10 +141,12 @@ export const TransactionDetailModal = ({
   };
 
   const handleEdit = () => {
+    hapticFeedback.light();
     setShowEditModal(true);
   };
 
   const handleDuplicate = () => {
+    hapticFeedback.medium();
     const newTransaction = {
       categoryId: txData.categoryId || '',
       amount: txData.amount,
@@ -263,7 +270,10 @@ export const TransactionDetailModal = ({
             {txData.receiptUrl && (
               <div className="pt-4">
                 <button
-                  onClick={() => setShowReceiptViewer(true)}
+                  onClick={() => {
+                    hapticFeedback.light();
+                    setShowReceiptViewer(true);
+                  }}
                   className="flex items-center gap-2 text-primary hover:underline"
                 >
                   <ImageIcon size={16} />

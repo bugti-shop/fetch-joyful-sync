@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Search, X, Filter, Calendar, DollarSign } from 'lucide-react';
 import { useExpense } from '@/contexts/ExpenseContext';
+import { hapticFeedback } from '@/lib/haptics';
 import { Input } from '@/components/ui/input';
 import { format } from 'date-fns';
 
@@ -78,12 +79,18 @@ export const ExpenseSearch = ({ onClose }: ExpenseSearchProps) => {
             />
           </div>
           <button
-            onClick={() => setShowFilters(!showFilters)}
+            onClick={() => {
+              hapticFeedback.light();
+              setShowFilters(!showFilters);
+            }}
             className={`p-3 rounded-xl transition-colors ${showFilters ? 'bg-primary text-primary-foreground' : 'bg-secondary'}`}
           >
             <Filter size={20} />
           </button>
-          <button onClick={onClose} className="p-3 rounded-xl bg-secondary">
+          <button onClick={() => {
+            hapticFeedback.light();
+            onClose();
+          }} className="p-3 rounded-xl bg-secondary">
             <X size={20} />
           </button>
         </div>
@@ -103,7 +110,10 @@ export const ExpenseSearch = ({ onClose }: ExpenseSearchProps) => {
                   <label className="text-sm font-medium text-foreground mb-2 block">Category</label>
                   <div className="flex flex-wrap gap-2">
                     <button
-                      onClick={() => setCategoryFilter('all')}
+                      onClick={() => {
+                        hapticFeedback.light();
+                        setCategoryFilter('all');
+                      }}
                       className={`px-3 py-1.5 rounded-lg text-sm transition-colors ${
                         categoryFilter === 'all' ? 'bg-primary text-primary-foreground' : 'bg-secondary'
                       }`}
@@ -113,7 +123,10 @@ export const ExpenseSearch = ({ onClose }: ExpenseSearchProps) => {
                     {categories.map(cat => (
                       <button
                         key={cat.id}
-                        onClick={() => setCategoryFilter(cat.id)}
+                        onClick={() => {
+                          hapticFeedback.light();
+                          setCategoryFilter(cat.id);
+                        }}
                         className={`px-3 py-1.5 rounded-lg text-sm transition-colors ${
                           categoryFilter === cat.id ? 'bg-primary text-primary-foreground' : 'bg-secondary'
                         }`}
@@ -177,6 +190,7 @@ export const ExpenseSearch = ({ onClose }: ExpenseSearchProps) => {
                 {/* Clear Filters */}
                 <button
                   onClick={() => {
+                    hapticFeedback.light();
                     setCategoryFilter('all');
                     setDateFrom('');
                     setDateTo('');

@@ -5,6 +5,7 @@ import { useExpense } from '@/contexts/ExpenseContext';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { useToast } from '@/hooks/use-toast';
+import { hapticFeedback } from '@/lib/haptics';
 
 interface AddExpenseModalProps {
   isOpen: boolean;
@@ -34,6 +35,7 @@ export const AddExpenseModal = ({ isOpen, onClose, preselectedCategory }: AddExp
       description: description || 'Expense',
       date,
     });
+    hapticFeedback.success();
 
     toast({ title: 'Expense added', description: `$${parseFloat(amount).toFixed(2)} added to ${categories.find(c => c.id === categoryId)?.name}` });
     
@@ -95,7 +97,10 @@ export const AddExpenseModal = ({ isOpen, onClose, preselectedCategory }: AddExp
                     <button
                       key={cat.id}
                       type="button"
-                      onClick={() => setCategoryId(cat.id)}
+                      onClick={() => {
+                        hapticFeedback.light();
+                        setCategoryId(cat.id);
+                      }}
                       className={`p-3 rounded-xl flex flex-col items-center gap-1 transition-all ${
                         categoryId === cat.id 
                           ? 'bg-primary text-primary-foreground scale-105 shadow-lg' 

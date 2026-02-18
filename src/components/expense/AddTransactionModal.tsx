@@ -6,6 +6,7 @@ import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { Label } from '@/components/ui/label';
 import { useToast } from '@/hooks/use-toast';
+import { hapticFeedback } from '@/lib/haptics';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { currencies, loadCurrencySettings, convertCurrency, formatCurrencyAmount, getCurrencyByCode } from '@/lib/currency';
 import { useSmartSuggestions } from '@/hooks/useSmartSuggestions';
@@ -284,6 +285,7 @@ export const AddTransactionModal = ({ isOpen, onClose, initialType = null }: Add
   const filteredCategories = transactionType === 'expense' ? expenseCategories : incomeCategories;
 
   const handleTypeSelect = (type: 'expense' | 'income') => {
+    hapticFeedback.medium();
     setTransactionType(type);
     setStep('form');
     const cats = type === 'expense' ? expenseCategories : incomeCategories;
@@ -323,12 +325,14 @@ export const AddTransactionModal = ({ isOpen, onClose, initialType = null }: Add
 
     if (transactionType === 'expense') {
       addExpense(transactionData);
+      hapticFeedback.success();
       toast({ 
         title: 'Expense added', 
         description: `${formatCurrencyAmount(originalAmount, selectedCurrency)} expense recorded` 
       });
     } else {
       addIncome(transactionData);
+      hapticFeedback.success();
       toast({ 
         title: 'Income added', 
         description: `${formatCurrencyAmount(originalAmount, selectedCurrency)} income recorded` 
@@ -406,6 +410,7 @@ export const AddTransactionModal = ({ isOpen, onClose, initialType = null }: Add
               {/* Batch Entry Button */}
               <button
                 onClick={() => {
+                  hapticFeedback.medium();
                   onClose();
                   setTimeout(() => setShowBatchModal(true), 100);
                 }}
@@ -431,7 +436,10 @@ export const AddTransactionModal = ({ isOpen, onClose, initialType = null }: Add
                 {voiceSupported && (
                   <button
                     type="button"
-                    onClick={isListening ? stopListening : startListening}
+                    onClick={() => {
+                      hapticFeedback.light();
+                      isListening ? stopListening() : startListening();
+                    }}
                     className={`flex-1 py-2.5 px-3 rounded-xl flex items-center justify-center gap-2 text-sm font-medium transition-all ${
                       isListening 
                         ? 'bg-destructive text-destructive-foreground animate-pulse' 
@@ -446,7 +454,10 @@ export const AddTransactionModal = ({ isOpen, onClose, initialType = null }: Add
                 {/* Location Suggest */}
                 <button
                   type="button"
-                  onClick={handleLocationSuggest}
+                  onClick={() => {
+                    hapticFeedback.light();
+                    handleLocationSuggest();
+                  }}
                   disabled={isLoadingLocation}
                   className="flex-1 py-2.5 px-3 rounded-xl flex items-center justify-center gap-2 text-sm font-medium bg-secondary hover:bg-secondary/80 text-foreground disabled:opacity-50"
                 >
