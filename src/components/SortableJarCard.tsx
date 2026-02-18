@@ -4,6 +4,7 @@ import { GripVertical, Trash2, Pin } from 'lucide-react';
 import JarVisualization from './JarVisualization';
 import CircularJarVisualization from './CircularJarVisualization';
 import { formatCurrency } from '@/lib/utils';
+import { hapticFeedback } from '@/lib/haptics';
 
 interface Jar {
   id: number;
@@ -83,6 +84,7 @@ export const SortableJarCard = ({
         <button
           onClick={(e) => {
             e.stopPropagation();
+            hapticFeedback.light();
             onPin(jar.id);
           }}
           className={`absolute top-2 right-2 p-1.5 rounded-full transition-opacity z-10 ${
@@ -99,6 +101,7 @@ export const SortableJarCard = ({
       <button
         onClick={(e) => {
           e.stopPropagation();
+          hapticFeedback.medium();
           onDelete(jar);
         }}
         className="absolute top-2 right-10 bg-red-500 text-white p-1.5 rounded-full opacity-0 group-hover:opacity-100 transition-opacity hover:bg-red-600 z-10"
@@ -107,7 +110,10 @@ export const SortableJarCard = ({
       </button>
 
       {/* Card Content */}
-      <div onClick={() => onSelect(jar)}>
+      <div onClick={() => {
+        hapticFeedback.light();
+        onSelect(jar);
+      }}>
         <h4 className={`text-sm sm:text-base font-bold ${textColor} mb-2`}>{jar.name}</h4>
         <div className="relative h-24 sm:h-32 mb-2 flex items-center justify-center">
           {jar.jarType === 'circular' ? (

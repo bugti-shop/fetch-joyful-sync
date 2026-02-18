@@ -625,7 +625,10 @@ const Index = () => {
                 </button>
               )}
               <button
-                onClick={cycleTheme}
+                onClick={() => {
+                  hapticFeedback.light();
+                  cycleTheme();
+                }}
                 className={`p-2 sm:p-3 rounded-full ${darkMode ? 'bg-gray-800/80' : 'bg-white/80'} backdrop-blur-sm shadow-lg hover:shadow-xl transition-all border ${darkMode ? 'border-gray-700' : 'border-gray-200'}`}
               >
                 {darkMode ? <Moon className="text-indigo-400" size={20} /> : <Sun className="text-yellow-600" size={20} />}
@@ -661,6 +664,7 @@ const Index = () => {
                 <div className="flex gap-2 sm:gap-3 -ml-[2.4%]">
                   <SavingsButton 
                     onClick={() => {
+                      hapticFeedback.light();
                       if (!canUseFeature('advancedCalculator')) {
                         setPaywallFeature('Savings Calculator');
                         setShowProPaywall(true);
@@ -674,7 +678,10 @@ const Index = () => {
                   >
                     📊 Calculator
                   </SavingsButton>
-                  <SavingsButton onClick={() => setShowNoteModal(true)} size="default" className="text-sm sm:text-base w-auto whitespace-nowrap">
+                  <SavingsButton onClick={() => {
+                    hapticFeedback.light();
+                    setShowNoteModal(true);
+                  }} size="default" className="text-sm sm:text-base w-auto whitespace-nowrap">
                     Add Note
                   </SavingsButton>
                 </div>
@@ -684,7 +691,10 @@ const Index = () => {
                   <div
                     key={note.id}
                     data-note-item
-                    onClick={() => setSelectedNoteId(note.id)}
+                    onClick={() => {
+                      hapticFeedback.light();
+                      setSelectedNoteId(note.id);
+                    }}
                     className="relative min-w-[220px] w-[220px] lg:w-full lg:max-w-[220px] h-[180px] p-4 rounded shadow-md flex-shrink-0 cursor-pointer"
                     style={{
                       backgroundColor: noteColors[note.color].bg,
@@ -717,7 +727,10 @@ const Index = () => {
                   <TrendingUp className="text-green-600" size={24} />
                   <h2 className={`text-lg sm:text-xl md:text-2xl font-bold ${textColor}`}>Savings</h2>
                 </div>
-                <SavingsButton onClick={() => setShowCategoryModal(true)} variant="secondary" size="default" className="text-sm sm:text-base md:text-lg whitespace-nowrap">
+                <SavingsButton onClick={() => {
+                  hapticFeedback.light();
+                  setShowCategoryModal(true);
+                }} variant="secondary" size="default" className="text-sm sm:text-base md:text-lg whitespace-nowrap">
                   Create Category
                 </SavingsButton>
               </div>
@@ -734,7 +747,10 @@ const Index = () => {
                     <div 
                       key={category.id} 
                       className={`${darkMode ? 'bg-gray-700/50' : 'bg-gradient-to-br from-blue-50/50 to-purple-50/50'} rounded-2xl p-4 sm:p-5 cursor-pointer`}
-                      onClick={() => setSelectedCategoryId(selectedCategoryId === category.id ? null : category.id)}
+                      onClick={() => {
+                        hapticFeedback.light();
+                        setSelectedCategoryId(selectedCategoryId === category.id ? null : category.id);
+                      }}
                     >
                       {/* Category Header */}
                       <div className="flex items-center justify-between mb-4">
@@ -821,6 +837,7 @@ const Index = () => {
                 {/* Add New Jar Button */}
                 <div className="flex items-center justify-center py-8">
                   <SavingsButton onClick={() => {
+                    hapticFeedback.medium();
                     if (categories.length > 0) {
                       setNewJar({ name: '', target: '', currency: '$', categoryId: categories[0].id, targetDate: '', jarType: 'flask', imageUrl: '', purposeType: 'saving' });
                     }
@@ -837,13 +854,17 @@ const Index = () => {
         ) : (
           <div className={`${cardBg} rounded-2xl sm:rounded-3xl p-4 sm:p-6 md:p-8 shadow-2xl`}>
             <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 sm:gap-4 mb-4 sm:mb-6">
-              <button onClick={() => setSelectedJar(null)} className={`${textSecondary} hover:underline text-sm sm:text-base`}>
+              <button onClick={() => {
+                hapticFeedback.light();
+                setSelectedJar(null);
+              }} className={`${textSecondary} hover:underline text-sm sm:text-base`}>
                 ← Back
               </button>
               <SavingsButton
                 variant="danger"
                 size="sm"
                 onClick={() => {
+                  hapticFeedback.medium();
                   setJarToDelete(selectedJar);
                   setShowDeleteConfirm(true);
                 }}
@@ -982,7 +1003,10 @@ const Index = () => {
             </div>
 
             <div className="grid grid-cols-2 gap-3 mb-6">
-              <SavingsButton onClick={() => setShowJarNoteModal(true)} size="default" className="text-sm sm:text-base whitespace-nowrap">
+              <SavingsButton onClick={() => {
+                hapticFeedback.light();
+                setShowJarNoteModal(true);
+              }} size="default" className="text-sm sm:text-base whitespace-nowrap">
                 Add Notes
               </SavingsButton>
               <SavingsButton onClick={() => {
