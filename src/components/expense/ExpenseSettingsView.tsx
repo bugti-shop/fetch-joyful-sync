@@ -1,4 +1,4 @@
-import { Settings, Tag, Bell, Download, Trash2, Wand2, History, Lightbulb, Repeat, Globe } from 'lucide-react';
+import { Settings, Tag, Bell, Download, Trash2, Wand2, History, Lightbulb, Repeat, Globe, Crown } from 'lucide-react';
 import { useState } from 'react';
 import { CustomCategoryManager } from './CustomCategoryManager';
 import { BudgetNotifications } from './BudgetNotifications';
@@ -10,6 +10,8 @@ import { RecurringTransactionsManager } from './RecurringTransactionsManager';
 import { CurrencySettings } from './CurrencySettings';
 import { useExpense } from '@/contexts/ExpenseContext';
 import { useToast } from '@/hooks/use-toast';
+import { useSubscription } from '@/contexts/SubscriptionContext';
+import { ProPaywall } from '@/components/ProPaywall';
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from '@/components/ui/alert-dialog';
 
 export const ExpenseSettingsView = () => {
@@ -22,7 +24,21 @@ export const ExpenseSettingsView = () => {
   const [showInsights, setShowInsights] = useState(false);
   const [showRecurring, setShowRecurring] = useState(false);
   const [showCurrency, setShowCurrency] = useState(false);
+  const [showPaywall, setShowPaywall] = useState(false);
+  const [paywallFeature, setPaywallFeature] = useState('');
   const { toast } = useToast();
+  const { canUseFeature } = useSubscription();
+
+  const isPremium = canUseFeature('spending_insights');
+
+  const handlePremiumAction = (feature: string, action: () => void) => {
+    if (isPremium) {
+      action();
+    } else {
+      setPaywallFeature(feature);
+      setShowPaywall(true);
+    }
+  };
 
   const handleClearData = () => {
     localStorage.removeItem('jarify_expenses');
@@ -35,13 +51,15 @@ export const ExpenseSettingsView = () => {
     window.location.reload();
   };
 
+  const premiumIds = ['insights', 'recurring', 'currency', 'wizard', 'history', 'notifications', 'export'];
+
   const settingsItems = [
     {
       id: 'insights',
       label: 'Spending Insights',
       description: 'Charts, trends, and money-saving tips',
       icon: Lightbulb,
-      onClick: () => setShowInsights(true),
+      onClick: () => handlePremiumAction('Spending Insights', () => setShowInsights(true)),
       highlight: true,
     },
     {
@@ -49,7 +67,7 @@ export const ExpenseSettingsView = () => {
       label: 'Recurring Transactions',
       description: 'Auto-track weekly, monthly, yearly payments',
       icon: Repeat,
-      onClick: () => setShowRecurring(true),
+      onClick: () => handlePremiumAction('Recurring Transactions', () => setShowRecurring(true)),
       highlight: true,
     },
     {
@@ -57,7 +75,7 @@ export const ExpenseSettingsView = () => {
       label: 'Currency Settings',
       description: 'Set base currency and exchange rates',
       icon: Globe,
-      onClick: () => setShowCurrency(true),
+      onClick: () => handlePremiumAction('Currency Settings', () => setShowCurrency(true)),
       highlight: true,
     },
     {
@@ -65,14 +83,14 @@ export const ExpenseSettingsView = () => {
       label: 'Budget Wizard',
       description: 'Smart budget recommendations based on income',
       icon: Wand2,
-      onClick: () => setShowBudgetWizard(true),
+      onClick: () => handlePremiumAction('Budget Wizard', () => setShowBudgetWizard(true)),
     },
     {
       id: 'history',
       label: 'Transaction History',
       description: 'View all transactions with filters & export',
       icon: History,
-      onClick: () => setShowHistory(true),
+      onClick: () => handlePremiumAction('Transaction History', () => setShowHistory(true)),
     },
     {
       id: 'categories',
@@ -86,14 +104,14 @@ export const ExpenseSettingsView = () => {
       label: 'Budget Alerts',
       description: 'Configure budget warning thresholds',
       icon: Bell,
-      onClick: () => setShowNotifications(true),
+      onClick: () => handlePremiumAction('Budget Alerts', () => setShowNotifications(true)),
     },
     {
       id: 'export',
       label: 'Export Data',
       description: 'Download your expense data as CSV',
       icon: Download,
-      onClick: () => setShowExport(true),
+      onClick: () => handlePremiumAction('Export Data', () => setShowExport(true)),
     },
     {
       id: 'clear',
@@ -140,6 +158,9 @@ export const ExpenseSettingsView = () => {
             <div className="flex-1">
               <p className={`font-medium ${item.destructive ? 'text-destructive' : 'text-foreground'}`}>
                 {item.label}
+                {!isPremium && premiumIds.includes(item.id) && (
+                  <Crown className="inline-block ml-1.5 h-3.5 w-3.5 text-amber-500" />
+                )}
                 {item.highlight && (
                   <span className="ml-2 text-xs bg-primary/20 text-primary px-2 py-0.5 rounded-full">
                     New
@@ -181,6 +202,8 @@ export const ExpenseSettingsView = () => {
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
+
+      <ProPaywall isOpen={showPaywall} onClose={() => setShowPaywall(false)} />
     </div>
   );
 };
