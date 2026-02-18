@@ -1,4 +1,5 @@
 import { Home, BarChart3, Wallet, Settings } from 'lucide-react';
+import { hapticFeedback } from '@/lib/haptics';
 
 export type ExpenseTab = 'home' | 'stats' | 'accounts' | 'settings';
 
@@ -25,7 +26,10 @@ export const ExpenseBottomNav = ({ activeTab, onTabChange }: ExpenseBottomNavPro
           return (
             <button
               key={tab.id}
-              onClick={() => onTabChange(tab.id)}
+              onClick={() => {
+                hapticFeedback.light();
+                onTabChange(tab.id);
+              }}
               className={`flex flex-col items-center gap-0.5 py-1.5 px-5 rounded-xl transition-colors ${
                 isActive ? 'bg-card border border-border shadow-sm' : ''
               }`}
