@@ -4,6 +4,7 @@ import { ArrowLeft, Pin, Settings, Plus, Trash2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { storage } from '@/lib/storage';
 import { formatCurrency } from '@/lib/utils';
+import { hapticFeedback } from '@/lib/haptics';
 import { DndContext, closestCenter, DragEndEvent, PointerSensor, useSensor, useSensors } from '@dnd-kit/core';
 import { SortableContext, horizontalListSortingStrategy, arrayMove } from '@dnd-kit/sortable';
 import { SortableJarCard } from '@/components/SortableJarCard';
@@ -161,6 +162,7 @@ const FolderDetail = () => {
   };
 
   const togglePin = (jarId: number) => {
+    hapticFeedback.light();
     const updatedGoals = goals.map(goal => 
       goal.id === jarId ? { ...goal, isPinned: !goal.isPinned } : goal
     );
@@ -184,6 +186,7 @@ const FolderDetail = () => {
   };
 
   const handleJarDelete = (jar: Jar) => {
+    hapticFeedback.medium();
     const allJars = storage.loadJars();
     const updatedJars = allJars.filter(j => j.id !== jar.id);
     storage.saveJars(updatedJars);
@@ -209,6 +212,7 @@ const FolderDetail = () => {
 
   const addMoney = () => {
     if (!addAmount || !selectedJar) return;
+    hapticFeedback.moneyAdded();
     const amount = parseFloat(addAmount);
     const allJars = storage.loadJars();
     const updatedJars = allJars.map(jar => {
@@ -237,6 +241,7 @@ const FolderDetail = () => {
 
   const withdrawMoney = () => {
     if (!withdrawAmount || !selectedJar) return;
+    hapticFeedback.moneyWithdrawn();
     const amount = parseFloat(withdrawAmount);
     const allJars = storage.loadJars();
     const updatedJars = allJars.map(jar => {
@@ -266,6 +271,7 @@ const FolderDetail = () => {
 
   const addJarNote = () => {
     if (newJarNote.text.trim() && selectedJar) {
+      hapticFeedback.success();
       const allJars = storage.loadJars();
       const updatedJars = allJars.map(jar => {
         if (jar.id === selectedJar.id) {
@@ -283,6 +289,7 @@ const FolderDetail = () => {
   };
 
   const deleteJarNote = (noteId: number) => {
+    hapticFeedback.medium();
     if (selectedJar) {
       const allJars = storage.loadJars();
       const updatedJars = allJars.map(jar => {
@@ -356,7 +363,10 @@ const FolderDetail = () => {
         <div className="max-w-screen-xl mx-auto px-4 py-4 flex items-center justify-between">
           <div className="flex items-center gap-4">
             <Button
-              onClick={() => navigate('/folders')}
+              onClick={() => {
+                hapticFeedback.light();
+                navigate('/folders');
+              }}
               variant="ghost"
               size="icon"
             >
@@ -365,7 +375,10 @@ const FolderDetail = () => {
             <h1 className="text-2xl font-bold text-foreground">{folderName}</h1>
           </div>
           <Button
-            onClick={() => navigate('/settings')}
+            onClick={() => {
+              hapticFeedback.light();
+              navigate('/settings');
+            }}
             variant="ghost"
             size="icon"
           >
@@ -464,7 +477,10 @@ const FolderDetail = () => {
         ) : (
           <div className={`${cardBg} rounded-2xl sm:rounded-3xl p-4 sm:p-6 md:p-8 shadow-2xl`}>
             <div className="flex justify-between items-center gap-4 mb-6">
-              <button onClick={() => setSelectedJar(null)} className={`${textSecondary} hover:underline text-sm sm:text-base`}>
+              <button onClick={() => {
+                hapticFeedback.light();
+                setSelectedJar(null);
+              }} className={`${textSecondary} hover:underline text-sm sm:text-base`}>
                 ← Back
               </button>
             </div>
@@ -589,10 +605,14 @@ const FolderDetail = () => {
             </div>
 
             <div className="grid grid-cols-2 gap-3 mb-6">
-              <SavingsButton onClick={() => setShowJarNoteModal(true)} size="default" className="text-sm sm:text-base whitespace-nowrap">
+              <SavingsButton onClick={() => {
+                hapticFeedback.light();
+                setShowJarNoteModal(true);
+              }} size="default" className="text-sm sm:text-base whitespace-nowrap">
                 Add Notes
               </SavingsButton>
               <SavingsButton onClick={() => {
+                hapticFeedback.light();
                 if (!canUseFeature('investment_plan')) {
                   setPaywallFeature('Transaction Records');
                   setShowProPaywall(true);
