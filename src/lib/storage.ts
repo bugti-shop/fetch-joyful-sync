@@ -103,6 +103,8 @@ const DEFAULT_FOLDERS: Folder[] = [
 const saveToStorage = <T>(key: string, data: T): void => {
   try {
     localStorage.setItem(key, JSON.stringify(data));
+    // Mark that local data changed for sync conflict detection
+    localStorage.setItem('jarify_last_local_change', new Date().toISOString());
   } catch (error) {
     console.error(`Error saving to localStorage (${key}):`, error);
   }

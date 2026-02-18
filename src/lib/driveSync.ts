@@ -221,31 +221,73 @@ export const downloadFromDrive = async (accessToken: string): Promise<SyncData |
   }
 };
 
+export type SyncDirection = 'uploaded' | 'downloaded' | 'merged' | 'none' | 'conflict';
+
+export interface SyncResult {
+  success: boolean;
+  direction: SyncDirection;
+  remoteData?: SyncData;
+  localData?: SyncData;
+}
+
 /**
- * Full sync: download from Drive, merge with local, upload back
+ * Check if local data has changed since last sync
  */
-export const performFullSync = async (accessToken: string): Promise<{ success: boolean; direction: 'uploaded' | 'downloaded' | 'merged' | 'none' }> => {
+const hasLocalChanges = (): boolean => {
+  const lastSync = localStorage.getItem('jarify_last_sync');
+  const lastLocalChange = localStorage.getItem('jarify_last_local_change');
+  if (!lastSync || !lastLocalChange) return true;
+  return new Date(lastLocalChange).getTime() > new Date(lastSync).getTime();
+};
+
+/**
+ * Mark that local data has changed
+ */
+export const markLocalChange = (): void => {
+  localStorage.setItem('jarify_last_local_change', new Date().toISOString());
+};
+
+/**
+ * Full sync: download from Drive, detect conflicts, or auto-resolve
+ */
+export const performFullSync = async (
+  accessToken: string,
+  resolution?: 'keep_local' | 'keep_remote' | 'merge'
+): Promise<SyncResult> => {
   try {
-    // Download existing backup
     const remoteData = await downloadFromDrive(accessToken);
     const lastLocalSync = localStorage.getItem('jarify_last_sync');
 
     if (!remoteData) {
-      // No remote data exists, upload local data
       const uploaded = await uploadToDrive(accessToken);
       return { success: uploaded, direction: 'uploaded' };
     }
 
     const remoteTime = new Date(remoteData.timestamp).getTime();
     const localTime = lastLocalSync ? new Date(lastLocalSync).getTime() : 0;
+    const localChanged = hasLocalChanges();
+
+    // If a resolution was provided, apply it
+    if (resolution) {
+      return await applyResolution(accessToken, resolution, remoteData);
+    }
+
+    // Detect conflict: remote is newer AND local has unsaved changes
+    if (remoteTime > localTime && localChanged && localTime > 0) {
+      const localData = collectSyncData();
+      return {
+        success: true,
+        direction: 'conflict',
+        remoteData,
+        localData,
+      };
+    }
 
     if (remoteTime > localTime) {
-      // Remote is newer, apply remote data then upload merged
       applySyncData(remoteData);
       const uploaded = await uploadToDrive(accessToken);
       return { success: uploaded, direction: 'downloaded' };
     } else {
-      // Local is newer or same, upload local data
       const uploaded = await uploadToDrive(accessToken);
       return { success: uploaded, direction: 'uploaded' };
     }
@@ -253,6 +295,74 @@ export const performFullSync = async (accessToken: string): Promise<{ success: b
     console.error('Full sync error:', error);
     return { success: false, direction: 'none' };
   }
+};
+
+/**
+ * Apply a conflict resolution choice
+ */
+const applyResolution = async (
+  accessToken: string,
+  resolution: 'keep_local' | 'keep_remote' | 'merge',
+  remoteData: SyncData
+): Promise<SyncResult> => {
+  switch (resolution) {
+    case 'keep_local': {
+      const uploaded = await uploadToDrive(accessToken);
+      return { success: uploaded, direction: 'uploaded' };
+    }
+    case 'keep_remote': {
+      applySyncData(remoteData);
+      return { success: true, direction: 'downloaded' };
+    }
+    case 'merge': {
+      // Merge: apply remote first, then overlay local non-empty values
+      const localData = collectSyncData();
+      applySyncData(remoteData);
+
+      // Re-apply local entries that have more data than remote
+      Object.entries(localData.data).forEach(([key, localValue]) => {
+        if (!localValue) return;
+        const remoteValue = remoteData.data[key];
+        if (!remoteValue) {
+          // Local has data remote doesn't — keep local
+          localStorage.setItem(key, localValue);
+          return;
+        }
+        try {
+          const localArr = JSON.parse(localValue);
+          const remoteArr = JSON.parse(remoteValue);
+          if (Array.isArray(localArr) && Array.isArray(remoteArr)) {
+            // Merge arrays by id, preferring newer entries
+            const merged = mergeArraysById(remoteArr, localArr);
+            localStorage.setItem(key, JSON.stringify(merged));
+          }
+        } catch {
+          // Not arrays, keep remote (already applied)
+        }
+      });
+
+      const uploaded = await uploadToDrive(accessToken);
+      return { success: uploaded, direction: 'merged' };
+    }
+    default:
+      return { success: false, direction: 'none' };
+  }
+};
+
+/**
+ * Merge two arrays by `id` field, preferring items from `priority` array
+ */
+const mergeArraysById = (base: any[], priority: any[]): any[] => {
+  const map = new Map<string, any>();
+  base.forEach(item => {
+    const id = item.id ?? item.name ?? JSON.stringify(item);
+    map.set(String(id), item);
+  });
+  priority.forEach(item => {
+    const id = item.id ?? item.name ?? JSON.stringify(item);
+    map.set(String(id), item);
+  });
+  return Array.from(map.values());
 };
 
 /**

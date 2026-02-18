@@ -9,6 +9,7 @@ import { ExpenseProvider } from "@/contexts/ExpenseContext";
 import { FamilyProvider } from "@/contexts/FamilyContext";
 import { GoogleAuthProvider } from "@/contexts/GoogleAuthContext";
 import { SyncProvider } from "@/contexts/SyncContext";
+import { SyncConflictDialog } from "@/components/SyncConflictDialog";
 import { BottomNav } from "@/components/BottomNav";
 import Index from "./pages/Index";
 import Progress from "./pages/Progress";
@@ -53,6 +54,7 @@ const App = () => (
                 <TooltipProvider>
                   <Toaster />
                   <Sonner />
+                  <SyncConflictDialog />
                   <BrowserRouter>
                     <AppRoutes />
                   </BrowserRouter>
