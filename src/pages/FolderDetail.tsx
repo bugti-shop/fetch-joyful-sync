@@ -11,6 +11,9 @@ import SavingsButton from '@/components/SavingsButton';
 import JarVisualization from '@/components/JarVisualization';
 import CircularJarVisualization from '@/components/CircularJarVisualization';
 import { RecurringTransactions } from '@/components/RecurringTransactions';
+import { useSubscription } from '@/contexts/SubscriptionContext';
+import { ProPaywall } from '@/components/ProPaywall';
+import { ProBadge } from '@/components/ProPaywall';
 
 interface RecurringTransaction {
   enabled: boolean;
@@ -63,6 +66,9 @@ interface TransactionRecord {
 const FolderDetail = () => {
   const { folderId } = useParams();
   const navigate = useNavigate();
+  const { canUseFeature } = useSubscription();
+  const [showProPaywall, setShowProPaywall] = useState(false);
+  const [paywallFeature, setPaywallFeature] = useState('');
   const [folderName, setFolderName] = useState('');
   const [goals, setGoals] = useState<Jar[]>([]);
   const [categories, setCategories] = useState<Category[]>([]);
@@ -586,7 +592,14 @@ const FolderDetail = () => {
               <SavingsButton onClick={() => setShowJarNoteModal(true)} size="default" className="text-sm sm:text-base whitespace-nowrap">
                 Add Notes
               </SavingsButton>
-              <SavingsButton onClick={() => setShowRecordsModal(true)} variant="secondary" size="default" className="text-sm sm:text-base whitespace-nowrap">
+              <SavingsButton onClick={() => {
+                if (!canUseFeature('investment_plan')) {
+                  setPaywallFeature('Transaction Records');
+                  setShowProPaywall(true);
+                } else {
+                  setShowRecordsModal(true);
+                }
+              }} variant="secondary" size="default" className="text-sm sm:text-base whitespace-nowrap">
                 📊 Records
               </SavingsButton>
             </div>
@@ -602,36 +615,70 @@ const FolderDetail = () => {
             </div>
 
             {/* Investment Projections */}
-            <div className={`${darkMode ? 'bg-gray-700' : 'bg-gradient-to-br from-blue-50 to-purple-50'} rounded-2xl p-4 mb-6`}>
-              <h3 className={`text-lg font-bold ${textColor} mb-2 flex items-center gap-2`}>
-                📈 Investment Plan
-                {selectedJar.targetDate && (
-                  <span className={`text-xs ${textSecondary} font-normal`}>
-                    (Target: {new Date(selectedJar.targetDate).toLocaleDateString()})
-                  </span>
-                )}
-              </h3>
-              <div className="grid grid-cols-3 gap-3">
-                <div className={`${darkMode ? 'bg-gray-800' : 'bg-white'} rounded-xl p-3 text-center`}>
-                  <p className={`text-xs ${textSecondary} mb-1`}>Daily</p>
-                  <p className={`text-xl font-bold ${textColor}`}>
-                    {selectedJar.currency || '€'}{formatCurrency(getInvestmentPlan(selectedJar).daily)}
-                  </p>
-                </div>
-                <div className={`${darkMode ? 'bg-gray-800' : 'bg-white'} rounded-xl p-3 text-center`}>
-                  <p className={`text-xs ${textSecondary} mb-1`}>Weekly</p>
-                  <p className={`text-xl font-bold ${textColor}`}>
-                    {selectedJar.currency || '€'}{formatCurrency(getInvestmentPlan(selectedJar).weekly)}
-                  </p>
-                </div>
-                <div className={`${darkMode ? 'bg-gray-800' : 'bg-white'} rounded-xl p-3 text-center`}>
-                  <p className={`text-xs ${textSecondary} mb-1`}>Monthly</p>
-                  <p className={`text-xl font-bold ${textColor}`}>
-                    {selectedJar.currency || '€'}{formatCurrency(getInvestmentPlan(selectedJar).monthly)}
-                  </p>
+            {canUseFeature('investment_plan') ? (
+              <div className={`${darkMode ? 'bg-gray-700' : 'bg-gradient-to-br from-blue-50 to-purple-50'} rounded-2xl p-4 mb-6`}>
+                <h3 className={`text-lg font-bold ${textColor} mb-2 flex items-center gap-2`}>
+                  📈 Investment Plan
+                  {selectedJar.targetDate && (
+                    <span className={`text-xs ${textSecondary} font-normal`}>
+                      (Target: {new Date(selectedJar.targetDate).toLocaleDateString()})
+                    </span>
+                  )}
+                </h3>
+                <div className="grid grid-cols-3 gap-3">
+                  <div className={`${darkMode ? 'bg-gray-800' : 'bg-white'} rounded-xl p-3 text-center`}>
+                    <p className={`text-xs ${textSecondary} mb-1`}>Daily</p>
+                    <p className={`text-xl font-bold ${textColor}`}>
+                      {selectedJar.currency || '€'}{formatCurrency(getInvestmentPlan(selectedJar).daily)}
+                    </p>
+                  </div>
+                  <div className={`${darkMode ? 'bg-gray-800' : 'bg-white'} rounded-xl p-3 text-center`}>
+                    <p className={`text-xs ${textSecondary} mb-1`}>Weekly</p>
+                    <p className={`text-xl font-bold ${textColor}`}>
+                      {selectedJar.currency || '€'}{formatCurrency(getInvestmentPlan(selectedJar).weekly)}
+                    </p>
+                  </div>
+                  <div className={`${darkMode ? 'bg-gray-800' : 'bg-white'} rounded-xl p-3 text-center`}>
+                    <p className={`text-xs ${textSecondary} mb-1`}>Monthly</p>
+                    <p className={`text-xl font-bold ${textColor}`}>
+                      {selectedJar.currency || '€'}{formatCurrency(getInvestmentPlan(selectedJar).monthly)}
+                    </p>
+                  </div>
                 </div>
               </div>
-            </div>
+            ) : (
+              <button
+                onClick={() => {
+                  setPaywallFeature('Investment Plan');
+                  setShowProPaywall(true);
+                }}
+                className={`w-full ${darkMode ? 'bg-gray-700' : 'bg-gradient-to-br from-blue-50 to-purple-50'} rounded-2xl p-4 mb-6 text-left relative overflow-hidden`}
+              >
+                <div className="flex items-center justify-between">
+                  <h3 className={`text-lg font-bold ${textColor} flex items-center gap-2`}>
+                    📈 Investment Plan
+                  </h3>
+                  <ProBadge />
+                </div>
+                <p className={`text-sm ${textSecondary} mt-2`}>
+                  Unlock daily, weekly & monthly saving targets
+                </p>
+                <div className="mt-3 grid grid-cols-3 gap-3 opacity-40 blur-[2px]">
+                  <div className={`${darkMode ? 'bg-gray-800' : 'bg-white'} rounded-xl p-3 text-center`}>
+                    <p className={`text-xs ${textSecondary}`}>Daily</p>
+                    <p className={`text-xl font-bold ${textColor}`}>$--</p>
+                  </div>
+                  <div className={`${darkMode ? 'bg-gray-800' : 'bg-white'} rounded-xl p-3 text-center`}>
+                    <p className={`text-xs ${textSecondary}`}>Weekly</p>
+                    <p className={`text-xl font-bold ${textColor}`}>$--</p>
+                  </div>
+                  <div className={`${darkMode ? 'bg-gray-800' : 'bg-white'} rounded-xl p-3 text-center`}>
+                    <p className={`text-xs ${textSecondary}`}>Monthly</p>
+                    <p className={`text-xl font-bold ${textColor}`}>$--</p>
+                  </div>
+                </div>
+              </button>
+            )}
 
             {selectedJar.notes && selectedJar.notes.length > 0 && (
               <div className={`${darkMode ? 'bg-gray-700' : 'bg-gray-50'} rounded-2xl p-4 mb-6`}>
@@ -745,6 +792,8 @@ const FolderDetail = () => {
           scrollbar-width: none;
         }
       `}</style>
+
+      <ProPaywall isOpen={showProPaywall} onClose={() => setShowProPaywall(false)} featureName={paywallFeature} />
     </div>
   );
 };
